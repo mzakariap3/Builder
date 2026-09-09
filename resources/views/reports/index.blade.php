@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Report Keuangan - Odeon Management</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
 </head>
 <body class="bg-[#f5f1ea] text-[#292529]">
 
@@ -48,27 +49,40 @@
                     Reports
                 </a>
             </nav>
-
-            <div class="mt-auto border-t border-[#a1403d] pt-5">
-                <form action="{{ route('logout') }}" method="POST">
-                    @csrf
-                    <button type="submit" class="flex w-full items-center gap-3 px-4 py-2 text-left text-[12px] text-[#f1dcd0] hover:text-white">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" x2="9" y1="12" y2="12"/></svg>
-                        Logout
-                    </button>
-                </form>
-            </div>
         </aside>
 
         <!-- Main Content -->
         <section class="lg:ml-[245px]">
-            <header class="flex h-[58px] items-center justify-between bg-[#c6a84c] px-5 text-[#401014] shadow-sm sm:px-8">
+            <header class="flex h-[58px] items-center justify-between px-5 text-[#401014] shadow-sm sm:px-8">
                 <div class="flex items-center gap-3">
                     <h1 class="text-[19px] font-bold">Report Keuangan</h1>
                 </div>
-                <div class="flex items-center gap-5">
-                    <div class="grid h-8 w-8 place-items-center rounded-full border-2 border-[#4a0d13] bg-[#650f15] text-xs font-bold text-[#edcf72]">
-                        {{ strtoupper(substr(Auth::user()->name ?? 'AS', 0, 2)) }}
+                <!-- Profile Dropdown (Alpine.js) -->
+                <div x-data="{ open: false }" class="relative">
+                    <!-- Icon/Avatar Profile Trigger -->
+                    <button @click="open = !open" type="button" class="grid h-8 w-8 place-items-center rounded-full border-2 border-[#4a0d13] bg-[#650f15] text-xs font-bold text-[#edcf72] transition-transform hover:scale-105 focus:outline-none">
+                        {{ strtoupper(substr(Auth::user()->name ?? 'A', 0, 2)) }}
+                    </button>
+
+                    <!-- Dropdown Menu -->
+                    <div x-show="open" 
+                         @click.outside="open = false" 
+                         x-transition 
+                         class="absolute right-0 mt-2 w-48 rounded-xl border border-[#bcb4a9] bg-[#fffdf9] py-2 shadow-lg z-50">
+                        
+                        <div class="px-4 py-2 border-b border-[#eee7dc]">
+                            <p class="text-xs font-bold text-[#292529]">{{ Auth::user()->name ?? 'Admin' }}</p>
+                            <p class="text-[10px] text-[#857c73] truncate">{{ Auth::user()->email ?? '' }}</p>
+                        </div>
+
+                        <!-- Fitur Logout -->
+                        <form action="{{ route('logout') }}" method="POST">
+                            @csrf
+                            <button type="submit" class="flex w-full items-center gap-2 px-4 py-2 text-left text-xs font-semibold text-[#6b2423] hover:bg-[#f5f1ea] transition-colors">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" x2="9" y1="12" y2="12"/></svg>
+                                Logout
+                            </button>
+                        </form>
                     </div>
                 </div>
             </header>
