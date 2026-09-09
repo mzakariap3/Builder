@@ -4,6 +4,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\TransactionController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\ReportController;
 
 // Route untuk Guest (Belum Login)
 Route::middleware('guest')->group(function () {
@@ -21,8 +22,11 @@ Route::middleware('auth')->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
     // Transaksi
-    Route::get('/transactions', [TransactionController::class, 'index'])->name('transactions.index'); // Tampilkan tabel
-    Route::post('/transactions', [TransactionController::class, 'store'])->name('transactions.store'); // Simpan data baru
+    Route::get('/transactions', [TransactionController::class, 'index'])->name('transactions.index');
+    Route::get('/transactions/create', [TransactionController::class, 'create'])->name('transactions.create');
+    Route::post('/transactions', [TransactionController::class, 'store'])->name('transactions.store');
+
+    Route::get('/reports', [ReportController::class, 'index'])->name('reports.index');
 
     // Logout (POST)
     Route::post('/logout', [AuthController::class, 'logout'])->name('logout');

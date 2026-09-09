@@ -22,14 +22,31 @@
             </div>
 
             <nav class="mt-10 space-y-2">
-                <a href="{{ route('dashboard') }}" class="flex w-full items-center gap-3 rounded-full bg-[#d3b75c] px-4 py-2.5 text-left text-[12px] font-semibold text-[#481014]">
+                <a href="{{ route('dashboard') }}"
+                         class="flex w-full items-center gap-3 rounded-full px-4 py-2.5 text-left text-[12px] font-semibold {{ request()->routeIs('dashboard') ? 'bg-[#d3b75c] text-[#481014]' : 'text-[#f1dcd0] hover:bg-[#8d1d22]' }}">
                     <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="7" height="9" x="3" y="3" rx="1"/><rect width="7" height="5" x="14" y="3" rx="1"/><rect width="7" height="9" x="14" y="12" rx="1"/><rect width="7" height="5" x="3" y="16" rx="1"/></svg>
                     Dashboard
                 </a>
 
-                <a href="{{ route('transactions.index') }}" class="flex w-full items-center gap-3 rounded-full px-4 py-2.5 text-left text-[12px] font-semibold text-[#f1dcd0] hover:bg-[#8d1d22]">
+                <!-- Input Keuangan -->
+                <a href="{{ route('transactions.create') }}" 
+                class="flex w-full items-center gap-3 rounded-full px-4 py-2.5 text-left text-[12px] font-semibold {{ request()->routeIs('transactions.create') ? 'bg-[#d3b75c] text-[#481014]' : 'text-[#f1dcd0] hover:bg-[#8d1d22]' }}">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/><line x1="16" x2="8" y1="13" y2="13"/><line x1="16" x2="8" y1="17" y2="17"/><line x1="10" x2="8" y1="9" y2="9"/></svg>
+                    Input Keuangan
+                </a>
+
+                <!-- Transaksi -->
+                <a href="{{ route('transactions.index') }}" 
+                class="flex w-full items-center gap-3 rounded-full px-4 py-2.5 text-left text-[12px] font-semibold {{ request()->routeIs('transactions.index') ? 'bg-[#d3b75c] text-[#481014]' : 'text-[#f1dcd0] hover:bg-[#8d1d22]' }}">
                     <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="14" x="2" y="5" rx="2"/><line x1="2" x2="22" y1="10" y2="10"/></svg>
                     Transaksi
+                </a>
+
+                <!-- Reports -->
+                <a href="{{ route('reports.index') }}" 
+                class="flex w-full items-center gap-3 rounded-full px-4 py-2.5 text-left text-[12px] font-semibold {{ request()->routeIs('reports.*') ? 'bg-[#d3b75c] text-[#481014]' : 'text-[#f1dcd0] hover:bg-[#8d1d22]' }}">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" x2="12" y1="20" y2="10"/><line x1="18" x2="18" y1="20" y2="4"/><line x1="6" x2="6" y1="20" y2="16"/></svg>
+                    Reports
                 </a>
             </nav>
 

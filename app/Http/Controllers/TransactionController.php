@@ -11,11 +11,12 @@ class TransactionController extends Controller
     {
         $transactions = Transaction::latest()->get();
 
-        $totalMasuk = Transaction::where('jenis', 'masuk')->sum('nominal');
-        $totalKeluar = Transaction::where('jenis', 'keluar')->sum('nominal');
-        $saldo = $totalMasuk - $totalKeluar;
+        return view('transactions.index', compact('transactions'));
+    }
 
-        return view('transactions.index', compact('transactions', 'saldo'));
+    public function create()
+    {
+        return view('transactions.create');
     }
 
     public function store(Request $request)

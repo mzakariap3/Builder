@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Data Transaksi - Odeon Management</title>
+    <title>Input Keuangan - Odeon Management</title>
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
@@ -51,7 +51,6 @@
             </nav>
 
             <div class="mt-auto border-t border-[#a1403d] pt-5">
-                <!-- Form Logout Admin -->
                 <form action="{{ route('logout') }}" method="POST">
                     @csrf
                     <button type="submit" class="flex w-full items-center gap-3 px-4 py-2 text-left text-[12px] text-[#f1dcd0] hover:text-white">
@@ -64,10 +63,9 @@
 
         <!-- Main Content Area -->
         <section class="w-full lg:ml-[245px]">
-            <!-- Header Bar -->
             <header class="flex h-[58px] items-center justify-between bg-[#c6a84c] px-5 text-[#401014] shadow-sm sm:px-8">
                 <div>
-                    <h1 class="text-[19px] font-bold">Data Transaksi</h1>
+                    <h1 class="text-[19px] font-bold">Input Keuangan</h1>
                     <p class="hidden font-sans text-[9px] text-[#654e14] sm:block">Data Keuangan Odeon Kampoeng Naga</p>
                 </div>
                 <div class="flex items-center gap-3">
@@ -78,67 +76,62 @@
                 </div>
             </header>
 
-            <!-- Table Section Container -->
-            <div class="relative min-h-[calc(100vh-58px)] px-5 py-6 sm:px-8 sm:py-7">
-                <div class="mx-auto max-w-[1100px]">
-                    <div class="mb-5">
-                        <h2 class="text-[26px] font-bold tracking-[-.035em]">Data Transaksi Kas</h2>
-                        <p class="mt-0.5 font-sans text-[11px] text-[#6f6962]">Kelola dan pantau seluruh transaksi keuangan masuk & keluar</p>
-                    </div>
+            <div class="relative min-h-[calc(100vh-58px)] px-5 py-7 sm:px-8 sm:py-8">
+                <div class="mx-auto max-w-[800px]">
+                    <h2 class="text-[29px] font-bold tracking-[-.04em] sm:text-[34px]">Input Keuangan</h2>
+                    <p class="mt-1 font-sans text-[11px] text-[#6f6962]">Catat pemasukan dan pengeluaran keuangan Odeon Kampoeng Naga</p>
 
-                    <section class="rounded-xl border border-[#d7d0c6] bg-white/95 p-4 shadow-sm sm:p-5">
-                        <!-- Search & Filter Controls -->
-                        <div class="flex flex-col gap-2 xl:flex-row">
-                            <div class="relative min-w-0 flex-1">
-                                <input type="text" placeholder="Cari transaksi..." class="h-9 w-full rounded border border-[#d5cec3] bg-white px-3 font-sans text-[11px] outline-none focus:border-[#a98c35]">
+                    <!-- Alert Notifikasi Berhasil -->
+                    @if(session('success'))
+                        <div class="mt-4 rounded border border-green-300 bg-green-100 p-3 font-sans text-[11px] font-semibold text-green-800">
+                            {{ session('success') }}
+                        </div>
+                    @endif
+
+                    <section class="mt-5 rounded-xl border border-[#cfc6b9] bg-[#fffefa] p-4 shadow-sm sm:p-6">
+                        
+                        <!-- Form Mengarah ke Controller Route Store -->
+                        <form action="{{ route('transactions.store') }}" method="POST" class="mt-2">
+                            @csrf
+
+                            <div class="grid gap-4 sm:grid-cols-2">
+                                <!-- Jenis Transaksi (Masuk / Keluar) -->
+                                <div class="sm:col-span-2">
+                                    <label class="block font-sans text-[10px] font-semibold text-[#554d47]">Jenis Transaksi</label>
+                                    <select name="jenis" required class="mt-1 h-9 w-full rounded border border-[#cfc6b9] bg-white px-3 font-sans text-[11px] outline-none focus:border-[#a58a35]">
+                                        <option value="masuk">Pemasukan (Kas Masuk)</option>
+                                        <option value="keluar">Pengeluaran (Kas Keluar)</option>
+                                    </select>
+                                </div>
+
+                                <!-- Tanggal -->
+                                <div>
+                                    <label class="block font-sans text-[10px] font-semibold text-[#554d47]">Tanggal</label>
+                                    <input type="date" name="tanggal" value="{{ date('Y-m-d') }}" required class="mt-1 h-9 w-full rounded border border-[#cfc6b9] bg-white px-3 font-sans text-[11px] outline-none focus:border-[#a58a35]">
+                                </div>
+
+                                <!-- Nominal (IDR) -->
+                                <div>
+                                    <label class="block font-sans text-[10px] font-semibold text-[#554d47]">Jumlah (IDR)</label>
+                                    <input type="number" name="nominal" min="0" placeholder="0" required class="mt-1 h-9 w-full rounded border border-[#cfc6b9] bg-white px-3 font-sans text-[11px] outline-none focus:border-[#a58a35]">
+                                </div>
                             </div>
-                        </div>
 
-                        <!-- Dynamic Table from Laravel Database -->
-                        <div class="mt-5 overflow-x-auto">
-                            <table class="w-full min-w-[760px] border-collapse text-left">
-                                <thead class="border-y border-[#e5dfd7] font-sans text-[10px] font-bold text-[#5f5953]">
-                                    <tr>
-                                        <th class="px-3 py-3">Tanggal</th>
-                                        <th class="px-3 py-3">Keterangan</th>
-                                        <th class="px-3 py-3">Jenis</th>
-                                        <th class="px-3 py-3">Nominal</th>
-                                    </tr>
-                                </thead>
-                                <tbody class="divide-y divide-[#e5dfd7] font-sans text-[10px]">
-                                    @forelse($transactions as $transaction)
-                                        <tr class="hover:bg-[#fcfaf5]">
-                                            <td class="whitespace-nowrap px-3 py-3.5 text-[#5c5650]">
-                                                {{ $transaction->tanggal }}
-                                            </td>
-                                            <td class="px-3 py-3.5 font-semibold text-[#302b28]">
-                                                {{ $transaction->keterangan }}
-                                            </td>
-                                            <td class="px-3 py-3.5">
-                                                <span class="rounded-full px-2.5 py-1 text-[9px] font-semibold {{ $transaction->jenis == 'masuk' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800' }}">
-                                                    {{ strtoupper($transaction->jenis) }}
-                                                </span>
-                                            </td>
-                                            <td class="whitespace-nowrap px-3 py-3.5 font-semibold {{ $transaction->jenis == 'masuk' ? 'text-[#897b26]' : 'text-[#6b2526]' }}">
-                                                {{ $transaction->jenis == 'masuk' ? '+' : '-' }} Rp {{ number_format($transaction->nominal, 0, ',', '.') }}
-                                            </td>
-                                        </tr>
-                                    @empty
-                                        <tr>
-                                            <td colspan="4" class="px-3 py-6 text-center text-[#777068]">
-                                                Belum ada data transaksi tersimpan di database.
-                                            </td>
-                                        </tr>
-                                    @endforelse
-                                </tbody>
-                            </table>
-                        </div>
+                            <!-- Keterangan / Deskripsi -->
+                            <div class="mt-4">
+                                <label class="block font-sans text-[10px] font-semibold text-[#554d47]">Keterangan Transaksi</label>
+                                <textarea name="keterangan" required placeholder="Contoh: Pembelian perlengkapan kantor / Pembayaran kas kelompok" class="mt-1 min-h-[90px] w-full resize-y rounded border border-[#cfc6b9] bg-white p-2.5 font-sans text-[11px] outline-none focus:border-[#a58a35]"></textarea>
+                            </div>
 
-                        <!-- Summary Footer -->
-                        <div class="mt-4 flex items-center justify-between border-t border-[#eee9e1] pt-3 font-sans text-[10px] text-[#777068]">
-                            <span>Total Data Transaksi: <strong>{{ $transactions->count() }}</strong></span>
-                            <span>Total Saldo Kas: <strong>Rp {{ number_format($saldo ?? 0, 0, ',', '.') }}</strong></span>
-                        </div>
+                            <!-- Footer Actions -->
+                            <div class="mt-5 flex items-center justify-end gap-3 border-t border-[#e5dfd6] pt-4">
+                                <a href="{{ route('transactions.index') }}" class="font-sans text-[10px] font-semibold text-[#4d3932] hover:underline">Batal</a>
+                                <button type="submit" class="flex items-center gap-1.5 bg-[#b89b42] px-5 py-2 font-sans text-[10px] font-semibold text-white transition hover:bg-[#a58a35]">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+                                    Simpan Transaksi
+                                </button>
+                            </div>
+                        </form>
                     </section>
                 </div>
             </div>
