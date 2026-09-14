@@ -25,7 +25,7 @@
           <span class="text-[13px] font-bold tracking-[.11em] text-[#e3c77d]">ODEONMONEY</span>
         </div>
         <h1 class="max-w-[420px] font-serif text-[42px] leading-[1.08] tracking-[-.04em] text-[#fff4e6] sm:text-[54px] lg:text-[56px]">
-          Selamat Datang<br />di OdeonMoney
+          Selamat Datang<br />di Sikawan Odeon
         </h1>
         <p class="mt-6 max-w-[440px] text-[11px] font-bold uppercase leading-[1.5] tracking-[.09em] text-[#e6c677] sm:text-[12px]">
           KELOLA KEUANGAN ODEON KAMPUNG NAGA DENGAN LEBIH MUDAH

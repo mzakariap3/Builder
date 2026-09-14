@@ -13,7 +13,7 @@ class DatabaseSeeder extends Seeder
         User::create([
             'name'     => 'Admin Odeon',
             'email'    => 'admin@odeon.com',
-            'password' => Hash::make('admin123'), // Password default
+            'password' => Hash::make('admin123'),
         ]);
     }
 }

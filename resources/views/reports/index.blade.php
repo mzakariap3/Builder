@@ -10,8 +10,8 @@
 <body class="bg-[#f5f1ea] text-[#292529]">
 
     <main class="min-h-screen bg-[#f5f1ea] text-[#292529]">
-        <!-- Sidebar Navigation -->
-        <aside class="fixed inset-y-0 left-0 z-30 flex w-[245px] flex-col bg-[#741116] px-4 py-6 text-[#fff5e6] transition-transform lg:translate-x-0">
+        <!-- Sidebar Navigation (Tambahkan print:hidden) -->
+        <aside class="fixed inset-y-0 left-0 z-30 flex w-[245px] flex-col bg-[#741116] px-4 py-6 text-[#fff5e6] transition-transform lg:translate-x-0 print:hidden">
             <div class="flex items-center gap-3 px-3">
                 <div class="grid h-9 w-9 place-items-center rounded-full border-2 border-[#bd9c42] bg-[#3d090e] text-sm font-bold text-[#d8b65a]">O</div>
                 <div>
@@ -51,20 +51,19 @@
             </nav>
         </aside>
 
-        <!-- Main Content -->
-        <section class="lg:ml-[245px]">
-            <header class="flex h-[58px] items-center justify-between px-5 text-[#401014] shadow-sm sm:px-8">
+        <!-- Main Content (Reset margin kiri saat print: print:ml-0) -->
+        <section class="lg:ml-[245px] print:ml-0">
+            <!-- Header Topbar (Tambahkan print:hidden) -->
+            <header class="flex h-[58px] items-center justify-between px-5 text-[#401014] shadow-sm sm:px-8 print:hidden">
                 <div class="flex items-center gap-3">
                     <h1 class="text-[19px] font-bold">Report Keuangan</h1>
                 </div>
-                <!-- Profile Dropdown (Alpine.js) -->
+                <!-- Profile Dropdown -->
                 <div x-data="{ open: false }" class="relative">
-                    <!-- Icon/Avatar Profile Trigger -->
                     <button @click="open = !open" type="button" class="grid h-8 w-8 place-items-center rounded-full border-2 border-[#4a0d13] bg-[#650f15] text-xs font-bold text-[#edcf72] transition-transform hover:scale-105 focus:outline-none">
                         {{ strtoupper(substr(Auth::user()->name ?? 'A', 0, 2)) }}
                     </button>
 
-                    <!-- Dropdown Menu -->
                     <div x-show="open" 
                          @click.outside="open = false" 
                          x-transition 
@@ -75,7 +74,6 @@
                             <p class="text-[10px] text-[#857c73] truncate">{{ Auth::user()->email ?? '' }}</p>
                         </div>
 
-                        <!-- Fitur Logout -->
                         <form action="{{ route('logout') }}" method="POST">
                             @csrf
                             <button type="submit" class="flex w-full items-center gap-2 px-4 py-2 text-left text-xs font-semibold text-[#6b2423] hover:bg-[#f5f1ea] transition-colors">
@@ -87,9 +85,9 @@
                 </div>
             </header>
 
-            <div class="relative min-h-[calc(100vh-58px)] overflow-hidden px-5 py-6 sm:px-8 sm:py-7">
-                <div class="absolute inset-0 bg-[#f7f3ec]"></div>
-                <div class="absolute inset-0 bg-cover bg-center opacity-[.14]" style="background-image: url('https://cdn.builder.io/api/v1/image/assets%2Fd2fcb98127044f13a5720636fbd8f3cc%2Ff09d63625a37498a9004fb7a40cf5034?format=webp&width=800&height=1200')"></div>
+            <div class="relative min-h-[calc(100vh-58px)] overflow-hidden px-5 py-6 sm:px-8 sm:py-7 print:p-0">
+                <div class="absolute inset-0 bg-[#f7f3ec] print:hidden"></div>
+                <div class="absolute inset-0 bg-cover bg-center opacity-[.14] print:hidden" style="background-image: url('https://cdn.builder.io/api/v1/image/assets%2Fd2fcb98127044f13a5720636fbd8f3cc%2Ff09d63625a37498a9004fb7a40cf5034?format=webp&width=800&height=1200')"></div>
                 
                 <div class="relative mx-auto max-w-[1100px]">
                     <!-- Header Actions -->
@@ -98,16 +96,24 @@
                             <h2 class="text-[27px] font-bold tracking-[-.04em]">Report Keuangan</h2>
                             <p class="mt-0.5 font-sans text-[11px] text-[#6f6962]">Ringkasan dan analisis keuangan Odeon Kampoeng Naga</p>
                         </div>
-                        <div class="flex flex-wrap gap-2">
-                            <button onclick="window.print()" class="flex items-center gap-2 rounded border border-[#a87070] bg-white px-3 py-2 font-sans text-[10px] font-semibold text-[#763032]">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/></svg>
-                                Download PDF
-                            </button>
-                        </div>
+                        <!-- Tombol Download (Tambahkan print:hidden) -->
+                        <div class="flex flex-wrap gap-2 print:hidden">
+                        <!-- Tombol PDF -->
+                        <button onclick="window.print()" class="flex items-center gap-2 rounded border border-[#a87070] bg-white px-3 py-2 font-sans text-[10px] font-semibold text-[#763032]">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/></svg>
+                            Download PDF
+                        </button>
+
+                        <!-- Tombol Excel -->
+                        <a href="{{ route('transaction.export') }}" class="flex items-center gap-2 rounded border border-[#428052] bg-[#428052] px-3 py-2 font-sans text-[10px] font-semibold text-white hover:bg-[#346641] transition-colors">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/><path d="M8 13h2"/><path d="M8 17h2"/><path d="M14 13h2"/><path d="M14 17h2"/></svg>
+                            Export Excel
+                        </a>
+</div>
                     </div>
 
-                    <!-- Filter Bulan -->
-                    <div class="mb-4 flex items-center gap-2">
+                    <!-- Filter Bulan (Tambahkan print:hidden) -->
+                    <div class="mb-4 flex items-center gap-2 print:hidden">
                         <form action="{{ route('reports.index') }}" method="GET">
                             <input type="month" name="bulan" value="{{ request('bulan', date('Y-m')) }}" onchange="this.form.submit()" class="rounded border border-[#d1c8ba] bg-white px-3 py-1.5 font-sans text-[10px] shadow-sm outline-none">
                         </form>
@@ -137,7 +143,7 @@
                             <p class="mt-2 font-sans text-[9px] text-[#8e4641]">Bulan terpilih</p>
                         </div>
 
-                        <div class="rounded-xl border border-[#c9c0b4] bg-[linear-gradient(135deg,#926b18,#d0ae48)] p-4 text-white shadow-sm">
+                        <div class="rounded-xl border border-[#c9c0b4] bg-[linear-gradient(135deg,#926b18,#d0ae48)] p-4 text-white shadow-sm print:bg-none print:text-black print:border-black">
                             <div class="flex items-center justify-between">
                                 <p class="font-sans text-[10px] font-semibold">Sisa Saldo Kas</p>
                                 <span class="grid h-7 w-7 place-items-center rounded bg-black/5">
@@ -145,7 +151,7 @@
                                 </span>
                             </div>
                             <p class="mt-4 text-[28px] font-bold leading-none tracking-[-.04em]">Rp {{ number_format($saldo, 0, ',', '.') }}</p>
-                            <p class="mt-2 font-sans text-[9px] text-[#fff0b2]">Akumulasi Kas</p>
+                            <p class="mt-2 font-sans text-[9px] text-[#fff0b2] print:text-black">Akumulasi Kas</p>
                         </div>
                     </div>
 
@@ -155,7 +161,7 @@
                         <div class="rounded-xl border border-[#c9c0b4] bg-[#fffefa] p-4 shadow-sm sm:p-5">
                             <div class="flex items-center justify-between">
                                 <h3 class="text-[16px] font-bold">Pemasukan vs Pengeluaran</h3>
-                                <span class="text-lg leading-none">•••</span>
+                                <span class="text-lg leading-none print:hidden">• • •</span>
                             </div>
                             <div class="relative mt-5 h-[205px] bg-[repeating-linear-gradient(to_bottom,transparent_0,transparent_38px,#ebe6dd_39px)]">
                                 <div class="absolute left-0 top-0 flex h-full flex-col justify-between font-sans text-[9px] text-[#827b74]">
@@ -192,13 +198,13 @@
                     </div>
 
                     <!-- Table Entries Section -->
-                    <section class="mt-4 rounded-xl border border-[#c9c0b4] bg-[#fffefa] p-4 shadow-sm sm:p-5">
+                    <section class="mt-4 rounded-xl border border-[#c9c0b4] bg-[#fffefa] p-4 shadow-sm sm:p-5 print:break-before-auto">
                         <div class="flex items-center justify-between">
                             <h3 class="text-[16px] font-bold">Entri Transaksi Terbaru</h3>
-                            <a href="{{ route('transactions.index') }}" class="font-sans text-[10px] font-semibold text-[#75621d]">View Full Ledger →</a>
+                            <a href="{{ route('transactions.index') }}" class="font-sans text-[10px] font-semibold text-[#75621d] print:hidden">View Full Ledger →</a>
                         </div>
                         <div class="mt-4 overflow-x-auto">
-                            <table class="w-full min-w-[700px] text-left font-sans text-[9px]">
+                            <table class="w-full min-w-[700px] text-left font-sans text-[9px] print:min-w-full">
                                 <thead class="border-b border-[#e5dfd6] text-[#6d665e]">
                                     <tr>
                                         <th class="px-2 py-2">Tanggal</th>
