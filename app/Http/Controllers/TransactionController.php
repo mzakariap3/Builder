@@ -6,6 +6,7 @@ use App\Models\Category;
 use App\Models\IncomeSource;
 use App\Models\TourismPlace;
 use App\Models\Transaction;
+use App\Notifications\PaymentStatusNotification;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
@@ -60,7 +61,20 @@ class TransactionController extends Controller
         $validated['amount'] = round((float) $validated['quantity'] * (float) $validated['unit_price'], 2);
         $validated['status'] = $validated['status'] ?? 'completed';
         $validated['proof_path'] = $this->storeProof($request);
-        Transaction::create($validated);
+
+        $transaction = Transaction::create($validated);
+
+        $statusNotif = $transaction->status == 'completed' ? 'success' : 'failed';
+        $pesanNotif = ($statusNotif === 'success')
+        ? "Transaksi {$transaction->type} '{$transaction->description}' berhasil dicatat."
+        : "Transaksi {$transaction->type} '{$transaction->description}' dalam status pending";
+
+        $request->user()->notify(new PaymentStatusNotification(
+            $statusNotif,
+            $transaction->amount,
+            $pesanNotif
+        ));
+
         return redirect()->route('transactions.index')->with('success', 'Transaksi berhasil ditambahkan.');
     }
 
@@ -74,6 +88,15 @@ class TransactionController extends Controller
             $validated['proof_path'] = $path;
         }
         $transaction->update($validated);
+
+    $statusNotif = $transaction->status === 'completed' ? 'success' : 'failed';
+    $pesanNotif  = "Data transaksi '{$transaction->description}' berhasil diperbarui.";
+
+    $request->user()->notify(new PaymentStatusNotification(
+        $statusNotif,
+        $transaction->amount,
+        $pesanNotif
+    ));
         return redirect()->route('transactions.index')->with('success', 'Transaksi berhasil diperbarui.');
     }
 
