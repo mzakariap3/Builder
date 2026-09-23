@@ -6,13 +6,23 @@ use App\Models\Category;
 use App\Models\IncomeSource;
 use App\Models\TourismPlace;
 use App\Models\Transaction;
+use App\Models\User;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Hash;
 
 class DatabaseSeeder extends Seeder
 {
     public function run(): void
     {
+        $admin = User::firstOrCreate(
+            ['email' => 'admin@odeon.id'],
+            [
+                'name' => 'Admin Utama',
+                'password' => Hash::make('password123'),
+            ]
+        );
+        
         $categories = [
             ['name' => 'Atraksi Wisata', 'type' => 'income'],
             ['name' => 'Pendapatan Desa Wisata', 'type' => 'income'],
@@ -49,10 +59,17 @@ class DatabaseSeeder extends Seeder
         ];
         foreach ($rows as $row) {
             Transaction::create([
-                'type'=>$row['type'], 'transaction_date'=>Carbon::parse($row['date']), 'category_id'=>$category($row['cat'])->id,
-                'tourism_place_id'=>$place($row['place'])->id, 'income_source_id'=>$row['source'] ? $source($row['source'])->id : null,
-                'package_name'=>$row['package'], 'description'=>$row['description'], 'quantity'=>$row['qty'], 'unit_price'=>$row['price'],
-                'amount'=>$row['qty'] * $row['price'], 'payment_method'=>$row['payment'], 'status'=>$row['status'],
+                'type'=>$row['type'], 
+                'transaction_date'=>Carbon::parse($row['date']), 
+                'category_id'=>$category($row['cat'])->id,
+                'tourism_place_id'=>$place($row['place'])->id, 
+                'income_source_id'=>$row['source'] ? $source($row['source'])->id : null,
+                'package_name'=>$row['package'], 
+                'description'=>$row['description'], 
+                'quantity'=>$row['qty'], 'unit_price'=>$row['price'],
+                'amount'=>$row['qty'] * $row['price'], 
+                'payment_method'=>$row['payment'], 
+                'status'=>$row['status'],
             ]);
         }
     }

@@ -12,7 +12,7 @@ Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
 Route::post('/login', [AuthController::class, 'login'])->name('login.store');
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
-Route::middleware('demo.auth')->group(function () {
+Route::middleware('auth')->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
     Route::get('/admin/dashboard', [DashboardController::class, 'admin'])->name('admin.dashboard');
     Route::resource('transactions', TransactionController::class)->except(['show']);

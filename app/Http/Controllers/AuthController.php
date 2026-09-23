@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\View\View;
 
 class AuthController extends Controller
@@ -20,26 +21,21 @@ class AuthController extends Controller
             'password' => ['required', 'string'],
         ]);
 
-        // Demo-only frontend prototype login. Replace with real Laravel auth later.
-        if ($credentials['email'] !== 'manager@odeon.com' || $credentials['password'] !== 'password') {
-            return back()->withInput($request->only('email'))
-                ->withErrors(['email' => 'Email atau password demo tidak sesuai.']);
+        if (Auth::attempt($credentials)) {
+            $request->session()->regenerate();
+            return redirect()->intended(route('dashboard'));
         }
-
-        $request->session()->regenerate();
-        $request->session()->put([
-            'demo_logged_in' => true,
-            'demo_name' => 'Odeon Manager',
-            'demo_email' => $credentials['email'],
-        ]);
-
-        return redirect()->route('dashboard');
+            return back()->withInput($request->only('email'))
+                ->withErrors(['email' => 'Email atau password tidak sesuai.']);
     }
 
     public function logout(Request $request): RedirectResponse
     {
+        Auth::logout();
+
         $request->session()->invalidate();
         $request->session()->regenerateToken();
+
         return redirect()->route('login');
     }
 }

@@ -25,7 +25,7 @@
             <form method="POST" action="{{ route('login.store') }}" class="login-form">
                 @csrf
                 <label>ALAMAT EMAIL</label>
-                <div class="input-wrap"><span>✉</span><input type="email" name="email" value="{{ old('email','manager@odeon.com') }}" placeholder="admin@email.com" required></div>
+                <div class="input-wrap"><span>✉</span><input type="email" name="email" value="{{ old('email') }}" placeholder="admin@email.com" autocomplete="off" required></div>
                 <div class="label-row"><label>KATA SANDI</label><a href="#">Lupa password?</a></div>
                 <div class="input-wrap"><span>♙</span><input id="password" type="password" name="password" value="" placeholder="••••••" required><button class="password-toggle" type="button" data-toggle-password="#password">◉</button></div>
                 <button class="gold-button full" type="submit">Masuk Sekarang</button>

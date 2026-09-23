@@ -34,7 +34,7 @@
                 <td>{{ rupiah($t->unit_price) }}</td>
                 <td class="{{ $t->type==='income' ? 'amount-income' : 'amount-expense' }}">{{ $t->type==='income' ? '+' : '-' }}{{ rupiah($t->amount) }}</td>
                 <td><span class="status {{ $t->status }}">● {{ ucfirst($t->status) }}</span></td>
-                <td class="actions"><a title="Edit" href="{{ route('transactions.edit',$t) }}">✎</a><form method="POST" action="{{ route('transactions.destroy',$t) }}" onsubmit="return confirm('Hapus transaksi ini?')">@csrf @method('DELETE')<button title="Delete">⋮</button></form></td>
+                <td class="actions"><a title="Edit" href="{{ route('transactions.edit',$t) }}">✎</a><form method="POST" action="{{ route('transactions.destroy',$t) }}" onsubmit="return confirm('Hapus transaksi ini?')">@csrf @method('DELETE')<button type="submit" title="Delete" class="delete-btn"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg></button></form></td>
             </tr>
             @empty
             <tr><td colspan="10"><div class="empty-state">Tidak ada data sesuai filter.</div></td></tr>

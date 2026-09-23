@@ -9,6 +9,7 @@ return new class extends Migration {
     {
         Schema::create('transactions', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('user_id')->nullable()->constrained('users')->nullOnDelete();
             $table->string('type');
             $table->date('transaction_date');
             $table->foreignId('category_id')->constrained()->cascadeOnUpdate()->restrictOnDelete();

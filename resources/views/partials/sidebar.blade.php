@@ -21,12 +21,4 @@
             <span class="nav-icon">▥</span><span>Reports</span>
         </a>
     </nav>
-
-    <div class="sidebar-bottom">
-        <a class="settings-link" href="{{ route('masters.index') }}"><span class="nav-icon">⚙</span> Master Data</a>
-        <form method="POST" action="{{ route('logout') }}">
-            @csrf
-            <button class="logout-link" type="submit"><span class="nav-icon">↪</span> Logout</button>
-        </form>
-    </div>
 </aside>

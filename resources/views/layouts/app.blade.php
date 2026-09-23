@@ -26,5 +26,14 @@
         </main>
     </div>
     @stack('scripts')
+<script>
+        document.addEventListener('click', function(e) {
+            document.querySelectorAll('.dropdown-details').forEach(function(dropdown) {
+                if (!dropdown.contains(e.target)) {
+                    dropdown.removeAttribute('open');
+                }
+            });
+        });
+    </script>
 </body>
 </html>
