@@ -176,45 +176,45 @@
             </table>
         </div>
 
-        {{-- Pagination Pemasukan --}}
-        @if ($transactions->hasPages())
-            <div class="pagination-row">
-                <div class="pagination-info">
-                    {{ __('transactions.showing') }}
-                    <strong>{{ $transactions->firstItem() ?? 0 }}</strong>
-                    {{ __('transactions.to') }}
-                    <strong>{{ $transactions->lastItem() ?? 0 }}</strong>
-                    {{ __('transactions.of') }}
-                    <strong>{{ $transactions->total() }}</strong>
-                    {{ __('transactions.entries') }}
-                </div>
-
-                <div class="pagination-links">
-                    {{-- Previous --}}
-                    @if ($transactions->onFirstPage())
-                        <span class="disabled">« {{ __('transactions.previous') }}</span>
-                    @else
-                        <a href="{{ $transactions->withQueryString()->previousPageUrl() }}">« {{ __('transactions.previous') }}</a>
-                    @endif
-
-                    {{-- Page Numbers --}}
-                    @for ($page = 1; $page <= $transactions->lastPage(); $page++)
-                        @if ($page === $transactions->currentPage())
-                            <span class="active">{{ $page }}</span>
-                        @else
-                            <a href="{{ $transactions->withQueryString()->url($page) }}">{{ $page }}</a>
-                        @endif
-                    @endfor
-
-                    {{-- Next --}}
-                    @if ($transactions->hasMorePages())
-                        <a href="{{ $transactions->withQueryString()->nextPageUrl() }}">{{ __('transactions.next') }} »</a>
-                    @else
-                        <span class="disabled">{{ __('transactions.next') }} »</span>
-                    @endif
-                </div>
+            {{-- Pagination Pemasukan --}}
+            @if ($incomes->hasPages())
+        <div class="pagination-row">
+            <div class="pagination-info">
+                {{ __('transactions.showing') }}
+                <strong>{{ $incomes->firstItem() ?? 0 }}</strong>
+                {{ __('transactions.to') }}
+                <strong>{{ $incomes->lastItem() ?? 0 }}</strong>
+                {{ __('transactions.of') }}
+                <strong>{{ $incomes->total() }}</strong>
+                {{ __('transactions.entries') }}
             </div>
-        @endif
+
+            <div class="pagination-links">
+                {{-- Previous --}}
+                @if ($incomes->onFirstPage())
+                    <span class="disabled">« {{ __('transactions.previous') }}</span>
+                @else
+                    <a href="{{ $incomes->previousPageUrl() }}">« {{ __('transactions.previous') }}</a>
+                @endif
+
+                {{-- Page Numbers --}}
+                @for ($page = 1; $page <= $incomes->lastPage(); $page++)
+                    @if ($page === $incomes->currentPage())
+                        <span class="active">{{ $page }}</span>
+                    @else
+                        <a href="{{ $incomes->url($page) }}">{{ $page }}</a>
+                    @endif
+                @endfor
+
+                {{-- Next --}}
+                @if ($incomes->hasMorePages())
+                    <a href="{{ $incomes->nextPageUrl() }}">{{ __('transactions.next') }} »</a>
+                @else
+                    <span class="disabled">{{ __('transactions.next') }} »</span>
+                @endif
+            </div>
+        </div>
+    @endif
     </div>
 
 
@@ -311,45 +311,45 @@
             </table>
         </div>
 
-        {{-- Pagination Pengeluaran --}}
-        @if ($transactions->hasPages())
-            <div class="pagination-row">
-                <div class="pagination-info">
-                    {{ __('transactions.showing') }}
-                    <strong>{{ $transactions->firstItem() ?? 0 }}</strong>
-                    {{ __('transactions.to') }}
-                    <strong>{{ $transactions->lastItem() ?? 0 }}</strong>
-                    {{ __('transactions.of') }}
-                    <strong>{{ $transactions->total() }}</strong>
-                    {{ __('transactions.entries') }}
-                </div>
-
-                <div class="pagination-links">
-                    {{-- Previous --}}
-                    @if ($transactions->onFirstPage())
-                        <span class="disabled">« {{ __('transactions.previous') }}</span>
-                    @else
-                        <a href="{{ $transactions->withQueryString()->previousPageUrl() }}">« {{ __('transactions.previous') }}</a>
-                    @endif
-
-                    {{-- Page Numbers --}}
-                    @for ($page = 1; $page <= $transactions->lastPage(); $page++)
-                        @if ($page === $transactions->currentPage())
-                            <span class="active">{{ $page }}</span>
-                        @else
-                            <a href="{{ $transactions->withQueryString()->url($page) }}">{{ $page }}</a>
-                        @endif
-                    @endfor
-
-                    {{-- Next --}}
-                    @if ($transactions->hasMorePages())
-                        <a href="{{ $transactions->withQueryString()->nextPageUrl() }}">{{ __('transactions.next') }} »</a>
-                    @else
-                        <span class="disabled">{{ __('transactions.next') }} »</span>
-                    @endif
-                </div>
+            {{-- Pagination Pengeluaran --}}
+            @if ($expenses->hasPages())
+        <div class="pagination-row">
+            <div class="pagination-info">
+                {{ __('transactions.showing') }}
+                <strong>{{ $expenses->firstItem() ?? 0 }}</strong>
+                {{ __('transactions.to') }}
+                <strong>{{ $expenses->lastItem() ?? 0 }}</strong>
+                {{ __('transactions.of') }}
+                <strong>{{ $expenses->total() }}</strong>
+                {{ __('transactions.entries') }}
             </div>
-        @endif
+
+            <div class="pagination-links">
+                {{-- Previous --}}
+                @if ($expenses->onFirstPage())
+                    <span class="disabled">« {{ __('transactions.previous') }}</span>
+                @else
+                    <a href="{{ $expenses->previousPageUrl() }}">« {{ __('transactions.previous') }}</a>
+                @endif
+
+                {{-- Page Numbers --}}
+                @for ($page = 1; $page <= $expenses->lastPage(); $page++)
+                    @if ($page === $expenses->currentPage())
+                        <span class="active">{{ $page }}</span>
+                    @else
+                        <a href="{{ $expenses->url($page) }}">{{ $page }}</a>
+                    @endif
+                @endfor
+
+                {{-- Next --}}
+                @if ($expenses->hasMorePages())
+                    <a href="{{ $expenses->nextPageUrl() }}">{{ __('transactions.next') }} »</a>
+                @else
+                    <span class="disabled">{{ __('transactions.next') }} »</span>
+                @endif
+            </div>
+        </div>
+    @endif
 
     </div>
 
