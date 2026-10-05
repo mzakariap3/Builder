@@ -21,59 +21,66 @@
 
 <form class="filter-panel report-filter" method="GET">
 
-    <select name="month">
-        @foreach(range(1, 12) as $m)
-            <option value="{{ $m }}" @selected($m === $month)>
-                {{ \Illuminate\Support\Carbon::create()->locale('id')->month($m)->translatedFormat('F') }}
-            </option>
-        @endforeach
-    </select>
-
-    <select name="year">
-        @foreach(range(now()->year - 2, now()->year + 1) as $y)
-            <option value="{{ $y }}" @selected($y === $year)>
-                {{ $y }}
-            </option>
-        @endforeach
-    </select>
-
-    <select name="type">
-        <option value="">
-            {{ __('messages.all_types') }}
-        </option>
-        <option value="income" @selected($type === 'income')>
-            {{ __('messages.income') }}
-        </option>
-        <option value="expense" @selected($type === 'expense')>
-            {{ __('messages.expense') }}
-        </option>
-    </select>
-
-    {{-- FILTER KATEGORI BARU --}}
-    <select name="category_id">
-        <option value="">
-            {{ __('messages.all_categories') ?? 'Semua Kategori' }}
-        </option>
-        <option value="uncategorized" @selected(request('category_id') === 'uncategorized')>
-            {{ __('messages.uncategorized') ?? 'Tanpa Kategori' }}
-        </option>
-        @if(isset($categories))
-            @foreach($categories as $cat)
-                @php
-                    $catTranslated = __('categories.' . \Illuminate\Support\Str::slug($cat->name, '_')) !== 'categories.' . \Illuminate\Support\Str::slug($cat->name, '_')
-                        ? __('categories.' . \Illuminate\Support\Str::slug($cat->name, '_'))
-                        : $cat->name;
-                @endphp
-                <option value="{{ $cat->id }}" @selected((string) request('category_id') === (string) $cat->id)>
-                    {{ $catTranslated }}
+        {{-- Filter Bulan (Sudah Ditambahkan "Semua Bulan" & Auto Submit) --}}
+        <select name="month" onchange="this.form.submit()">
+            <option value="">{{ __('transactions.filter_all_months') ?? 'Semua Bulan' }}</option>
+            @foreach(range(1, 12) as $m)
+                <option value="{{ $m }}" @selected((string) request('month') === (string) $m)>
+                    {{ \Illuminate\Support\Carbon::create()->locale(app()->getLocale())->month($m)->translatedFormat('F') }}
                 </option>
             @endforeach
-        @endif
-    </select>
+        </select>
 
-    <button class="outline-button" type="submit">
-        {{ __('messages.apply') }}
-    </button>
+        {{-- Filter Tahun --}}
+        <select name="year" onchange="this.form.submit()">
+            <option value="">{{ __('transactions.filter_all_years') ?? 'Semua Tahun' }}</option>
+            @foreach(range(now()->year - 2, now()->year + 1) as $y)
+                <option value="{{ $y }}" @selected((string) request('year') === (string) $y)>
+                    {{ $y }}
+                </option>
+            @endforeach
+        </select>
+
+        {{-- Filter Tipe Transaksi --}}
+        <select name="type" onchange="this.form.submit()">
+            <option value="">
+                {{ __('messages.all_types') ?? 'Semua Tipe' }}
+            </option>
+            <option value="income" @selected(request('type') === 'income')>
+                {{ __('messages.income') }}
+            </option>
+            <option value="expense" @selected(request('type') === 'expense')>
+                {{ __('messages.expense') }}
+            </option>
+        </select>
+
+        {{-- Filter Kategori --}}
+        <select name="category_id" onchange="this.form.submit()">
+            <option value="">
+                {{ __('messages.all_categories') ?? 'Semua Kategori' }}
+            </option>
+            <option value="uncategorized" @selected(request('category_id') === 'uncategorized')>
+                {{ __('messages.uncategorized') ?? 'Tanpa Kategori' }}
+            </option>
+            @if(isset($categories))
+                @foreach($categories as $cat)
+                    @php
+                        $catTranslated = __('categories.' . \Illuminate\Support\Str::slug($cat->name, '_')) !== 'categories.' . \Illuminate\Support\Str::slug($cat->name, '_')
+                            ? __('categories.' . \Illuminate\Support\Str::slug($cat->name, '_'))
+                            : $cat->name;
+                    @endphp
+                    <option value="{{ $cat->id }}" @selected((string) request('category_id') === (string) $cat->id)>
+                        {{ $catTranslated }}
+                    </option>
+                @endforeach
+            @endif
+        </select>
+
+        {{-- Reset Filter --}}
+        <a class="outline-button" href="{{ request()->url() }}">
+            {{ __('transactions.btn_reset') ?? 'Reset' }}
+        </a>
+    </form>
 
 </form>
 
@@ -168,7 +175,6 @@
                     <div>
                         <span>
                             <i class="dot {{ $loop->index % 2 ? 'red' : 'gold' }}"></i>
-                            {{-- Translasi otomatis nama kategori jika tersedia di lang file --}}
                             {{ __('categories.' . \Illuminate\Support\Str::slug($item->category_name, '_')) !== 'categories.' . \Illuminate\Support\Str::slug($item->category_name, '_')
                                 ? __('categories.' . \Illuminate\Support\Str::slug($item->category_name, '_'))
                                 : $item->category_name }}

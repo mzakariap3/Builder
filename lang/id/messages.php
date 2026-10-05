@@ -183,6 +183,7 @@ return [
     'view_full_ledger' => 'Lihat Semua Transaksi',
     'reference' => 'Referensi',
     'no_expenses_period' => 'Belum ada pengeluaran untuk periode ini.',
+    'no_expense_data' => 'Tidak Ada Data Pengeluaran',
 
     // Notifikasi transaksi
     'transaction_recorded' => "Transaksi :type ':description' berhasil dicatat.",

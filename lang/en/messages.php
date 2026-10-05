@@ -183,6 +183,7 @@ return [
     'view_full_ledger' => 'View Full Ledger',
     'reference' => 'Reference',
     'no_expenses_period' => 'No expenses for this period.',
+    'no_expense_data' => 'No Expense Data',
 
     // Transaction Notifications
     'transaction_recorded' => "Transaction :type ':description' was successfully recorded.",

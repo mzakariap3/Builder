@@ -31,7 +31,6 @@
             <option value="">{{ __('transactions.filter_all_months') }}</option>
             @foreach (range(1, 12) as $m)
                 <option value="{{ $m }}" @selected((string) request('month') === (string) $m)>
-                    {{-- Menggunakan locale bawaan aplikasi --}}
                     {{ \Illuminate\Support\Carbon::create()->locale(app()->getLocale())->month($m)->translatedFormat('F') }}
                 </option>
             @endforeach
@@ -88,7 +87,7 @@
     <div class="table-card">
         <div class="table-top" style="border-bottom: 2px solid #16a34a; padding-bottom: 12px; margin-bottom: 12px;">
             <div style="display: flex; align-items: center; gap: 8px;">
-                <span style="font-size: 18px; font-weight: 700; color: #16a34a;">📥 {{ __('messages.income') ?? 'Data Pemasukan' }}</span>
+                <span style="font-size: 18px; font-weight: 700; color: #16a34a;">{{ __('messages.income') ?? 'Data Pemasukan' }}</span>
                 <span class="tag" style="background: #dcfce7; color: #15803d; font-weight: 600;">
                     {{ $incomes->total() }} {{ __('transactions.entries_count') }}
                 </span>
@@ -223,7 +222,7 @@
     <div class="table-card">
         <div class="table-top" style="border-bottom: 2px solid #dc2626; padding-bottom: 12px; margin-bottom: 12px;">
             <div style="display: flex; align-items: center; gap: 8px;">
-                <span style="font-size: 18px; font-weight: 700; color: #dc2626;">📤 {{ __('messages.expense') ?? 'Data Pengeluaran' }}</span>
+                <span style="font-size: 18px; font-weight: 700; color: #dc2626;">{{ __('messages.expense') ?? 'Data Pengeluaran' }}</span>
                 <span class="tag" style="background: #fee2e2; color: #b91c1c; font-weight: 600;">
                     {{ $expenses->total() }} {{ __('transactions.entries_count') }}
                 </span>
