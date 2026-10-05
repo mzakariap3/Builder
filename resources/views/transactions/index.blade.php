@@ -26,16 +26,6 @@
             >
         </div>
 
-        <select name="type">
-            <option value="">{{ __('transactions.filter_all_types') }}</option>
-            <option value="income" @selected(request('type') === 'income')>
-                {{ __('transactions.type_income') }}
-            </option>
-            <option value="expense" @selected(request('type') === 'expense')>
-                {{ __('transactions.type_expense') }}
-            </option>
-        </select>
-
         <select name="month">
             <option value="">{{ __('transactions.filter_all_months') }}</option>
             @foreach (range(1, 12) as $m)
@@ -91,23 +81,24 @@
         </a>
     </form>
 
-    {{-- Transaction Table --}}
+    <div style="display: flex; flex-direction: column; gap: 24px;">
+
+    {{-- ================= TABEL PEMASUKAN ================= --}}
     <div class="table-card">
-
-        {{-- Table Header --}}
-        <div class="table-top">
-            <span>
-                {{ $transactions->total() }} {{ __('transactions.entries_count') }}
-            </span>
-
+        <div class="table-top" style="border-bottom: 2px solid #16a34a; padding-bottom: 12px; margin-bottom: 12px;">
+            <div style="display: flex; align-items: center; gap: 8px;">
+                <span style="font-size: 18px; font-weight: 700; color: #16a34a;">📥 {{ __('messages.income') ?? 'Data Pemasukan' }}</span>
+                <span class="tag" style="background: #dcfce7; color: #15803d; font-weight: 600;">
+                    {{ $incomes->total() }} {{ __('transactions.entries_count') }}
+                </span>
+            </div>
             <a class="outline-button compact" href="{{ route('masters.index') }}">
                 {{ __('transactions.btn_edit_options') }}
             </a>
         </div>
 
-        {{-- Table --}}
         <div class="table-scroll">
-            <table id="transactionTable" class="transaction-table">
+            <table class="transaction-table">
                 <thead>
                     <tr>
                         <th>{{ __('transactions.th_date') }}</th>
@@ -122,9 +113,8 @@
                         <th>{{ __('transactions.th_actions') }}</th>
                     </tr>
                 </thead>
-
                 <tbody>
-                    @forelse ($transactions as $t)
+                    @forelse ($incomes as $t)
                         <tr>
                             <td>{{ $t->transaction_date->format('d M Y') }}</td>
                             <td>
@@ -133,7 +123,6 @@
                                     <div><small style="color: #6b7280;">{{ $t->package_name }}</small></div>
                                 @endif
 
-                                {{-- Render Custom Values --}}
                                 @if (!empty($t->custom_values))
                                     <div style="margin-top: 4px; font-size: 11px; color: #4b5563; background: #f3f4f6; padding: 4px 6px; border-radius: 4px;">
                                         @foreach ($t->custom_values as $key => $value)
@@ -152,23 +141,16 @@
                             </td>
                             <td>{{ $t->tourismPlace?->name ?? '-' }}</td>
                             <td>{{ $t->incomeSource?->name ?? '-' }}</td>
-                            <td>
-                                {{ rtrim(rtrim(number_format($t->quantity, 2, ',', '.'), '0'), ',') }}
-                            </td>
+                            <td>{{ rtrim(rtrim(number_format($t->quantity, 2, ',', '.'), '0'), ',') }}</td>
                             <td>{{ rupiah($t->unit_price) }}</td>
-                            <td class="{{ $t->type === 'income' ? 'amount-income' : 'amount-expense' }}">
-                                {{ $t->type === 'income' ? '+' : '-' }}{{ rupiah($t->amount) }}
-                            </td>
+                            <td class="amount-income">+{{ rupiah($t->amount) }}</td>
                             <td>
                                 <span class="status {{ $t->status }}">
                                     ● {{ ucfirst($t->status) }}
                                 </span>
                             </td>
                             <td class="actions">
-                                <a title="{{ __('transactions.btn_edit') }}" href="{{ route('transactions.edit', $t) }}">
-                                    ✎
-                                </a>
-
+                                <a title="{{ __('transactions.btn_edit') }}" href="{{ route('transactions.edit', $t) }}">✎</a>
                                 <form method="POST" action="{{ route('transactions.destroy', $t) }}" onsubmit="return confirm('{{ __('transactions.confirm_delete') }}')">
                                     @csrf
                                     @method('DELETE')
@@ -194,7 +176,142 @@
             </table>
         </div>
 
-        {{-- Pagination --}}
+        {{-- Pagination Pemasukan --}}
+        @if ($transactions->hasPages())
+            <div class="pagination-row">
+                <div class="pagination-info">
+                    {{ __('transactions.showing') }}
+                    <strong>{{ $transactions->firstItem() ?? 0 }}</strong>
+                    {{ __('transactions.to') }}
+                    <strong>{{ $transactions->lastItem() ?? 0 }}</strong>
+                    {{ __('transactions.of') }}
+                    <strong>{{ $transactions->total() }}</strong>
+                    {{ __('transactions.entries') }}
+                </div>
+
+                <div class="pagination-links">
+                    {{-- Previous --}}
+                    @if ($transactions->onFirstPage())
+                        <span class="disabled">« {{ __('transactions.previous') }}</span>
+                    @else
+                        <a href="{{ $transactions->withQueryString()->previousPageUrl() }}">« {{ __('transactions.previous') }}</a>
+                    @endif
+
+                    {{-- Page Numbers --}}
+                    @for ($page = 1; $page <= $transactions->lastPage(); $page++)
+                        @if ($page === $transactions->currentPage())
+                            <span class="active">{{ $page }}</span>
+                        @else
+                            <a href="{{ $transactions->withQueryString()->url($page) }}">{{ $page }}</a>
+                        @endif
+                    @endfor
+
+                    {{-- Next --}}
+                    @if ($transactions->hasMorePages())
+                        <a href="{{ $transactions->withQueryString()->nextPageUrl() }}">{{ __('transactions.next') }} »</a>
+                    @else
+                        <span class="disabled">{{ __('transactions.next') }} »</span>
+                    @endif
+                </div>
+            </div>
+        @endif
+    </div>
+
+
+    {{-- ================= TABEL PENGELUARAN ================= --}}
+    <div class="table-card">
+        <div class="table-top" style="border-bottom: 2px solid #dc2626; padding-bottom: 12px; margin-bottom: 12px;">
+            <div style="display: flex; align-items: center; gap: 8px;">
+                <span style="font-size: 18px; font-weight: 700; color: #dc2626;">📤 {{ __('messages.expense') ?? 'Data Pengeluaran' }}</span>
+                <span class="tag" style="background: #fee2e2; color: #b91c1c; font-weight: 600;">
+                    {{ $expenses->total() }} {{ __('transactions.entries_count') }}
+                </span>
+            </div>
+            <a class="outline-button compact" href="{{ route('masters.index') }}">
+                {{ __('transactions.btn_edit_options') }}
+            </a>
+        </div>
+
+        <div class="table-scroll">
+            <table class="transaction-table">
+                <thead>
+                    <tr>
+                        <th>{{ __('transactions.th_date') }}</th>
+                        <th>{{ __('transactions.th_description') }}</th>
+                        <th>{{ __('transactions.th_category') }}</th>
+                        <th>{{ __('transactions.th_place') }}</th>
+                        <th>{{ __('transactions.th_source') }}</th>
+                        <th>{{ __('transactions.th_quantity') }}</th>
+                        <th>{{ __('transactions.th_unit_price') }}</th>
+                        <th>{{ __('transactions.th_total') }}</th>
+                        <th>{{ __('transactions.th_status') }}</th>
+                        <th>{{ __('transactions.th_actions') }}</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @forelse ($expenses as $t)
+                        <tr>
+                            <td>{{ $t->transaction_date->format('d M Y') }}</td>
+                            <td>
+                                <b>{{ $t->description }}</b>
+                                @if ($t->package_name)
+                                    <div><small style="color: #6b7280;">{{ $t->package_name }}</small></div>
+                                @endif
+
+                                @if (!empty($t->custom_values))
+                                    <div style="margin-top: 4px; font-size: 11px; color: #4b5563; background: #f3f4f6; padding: 4px 6px; border-radius: 4px;">
+                                        @foreach ($t->custom_values as $key => $value)
+                                            <div>
+                                                <strong>{{ ucfirst(str_replace('_', ' ', $key)) }}:</strong>
+                                                {{ is_array($value) ? implode(', ', $value) : $value }}
+                                            </div>
+                                        @endforeach
+                                    </div>
+                                @endif
+                            </td>
+                            <td>
+                                <span class="tag">
+                                    {{ $t->category?->name ?? __('transactions.no_category') }}
+                                </span>
+                            </td>
+                            <td>{{ $t->tourismPlace?->name ?? '-' }}</td>
+                            <td>{{ $t->incomeSource?->name ?? '-' }}</td>
+                            <td>{{ rtrim(rtrim(number_format($t->quantity, 2, ',', '.'), '0'), ',') }}</td>
+                            <td>{{ rupiah($t->unit_price) }}</td>
+                            <td class="amount-expense">-{{ rupiah($t->amount) }}</td>
+                            <td>
+                                <span class="status {{ $t->status }}">
+                                    ● {{ ucfirst($t->status) }}
+                                </span>
+                            </td>
+                            <td class="actions">
+                                <a title="{{ __('transactions.btn_edit') }}" href="{{ route('transactions.edit', $t) }}">✎</a>
+                                <form method="POST" action="{{ route('transactions.destroy', $t) }}" onsubmit="return confirm('{{ __('transactions.confirm_delete') }}')">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button type="submit" title="{{ __('transactions.btn_delete') }}" class="delete-btn">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                            <polyline points="3 6 5 6 21 6"></polyline>
+                                            <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                                        </svg>
+                                    </button>
+                                </form>
+                            </td>
+                        </tr>
+                    @empty
+                        <tr>
+                            <td colspan="10">
+                                <div class="empty-state">
+                                    {{ __('transactions.empty_state') }}
+                                </div>
+                            </td>
+                        </tr>
+                    @endforelse
+                </tbody>
+            </table>
+        </div>
+
+        {{-- Pagination Pengeluaran --}}
         @if ($transactions->hasPages())
             <div class="pagination-row">
                 <div class="pagination-info">

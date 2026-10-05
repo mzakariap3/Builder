@@ -25,9 +25,7 @@ class TransactionController extends Controller
                   ->orWhereHas('category', fn ($cq) => $cq->where('name', 'like', "%{$search}%"));
             });
         }
-        if ($request->filled('type') && in_array($request->type, ['income', 'expense'], true)) {
-            $query->where('type', $request->type);
-        }
+        
         if ($request->filled('category_id')) $query->where('category_id', $request->category_id);
         if ($request->filled('tourism_place_id')) $query->where('tourism_place_id', $request->tourism_place_id);
         if ($request->filled('income_source_id')) $query->where('income_source_id', $request->income_source_id);
@@ -37,12 +35,24 @@ class TransactionController extends Controller
             $query->whereYear('transaction_date', $request->year);
         }
 
+        // Pemasukan (Income)
+        $incomes = (clone $query)->where('type', 'income')
+            ->latest('transaction_date')
+            ->paginate(8, ['*'], 'income_page')
+            ->withQueryString();
+
+        // Pengeluaran (Expense)
+        $expenses = (clone $query)->where('type', 'expense')
+            ->latest('transaction_date')
+            ->paginate(8, ['*'], 'expense_page')
+            ->withQueryString();
+
         $transactions = $query->latest('transaction_date')->paginate(8)->withQueryString();
         $categories = Category::where('is_active', true)->orderBy('name')->get();
         $places = TourismPlace::where('is_active', true)->orderBy('name')->get();
         $sources = IncomeSource::where('is_active', true)->orderBy('name')->get();
 
-        return view('transactions.index', compact('transactions', 'categories', 'places', 'sources'));
+        return view('transactions.index', compact('transactions', 'incomes', 'expenses', 'categories', 'places', 'sources'));
     }
 
     public function create(): View
