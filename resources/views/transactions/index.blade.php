@@ -23,10 +23,11 @@
                 name="search"
                 value="{{ request('search') }}"
                 placeholder="{{ __('transactions.filter_search_placeholder') }}"
+                onchange="this.form.submit()"
             >
         </div>
 
-        <select name="month">
+        <select name="month" onchange="this.form.submit()">
             <option value="">{{ __('transactions.filter_all_months') }}</option>
             @foreach (range(1, 12) as $m)
                 <option value="{{ $m }}" @selected((string) request('month') === (string) $m)>
@@ -36,7 +37,7 @@
             @endforeach
         </select>
 
-        <select name="year">
+        <select name="year" onchange="this.form.submit()">
             <option value="">{{ __('transactions.filter_all_years') }}</option>
             @foreach (range(now()->year - 2, now()->year + 1) as $y)
                 <option value="{{ $y }}" @selected((string) request('year') === (string) $y)>
@@ -45,7 +46,7 @@
             @endforeach
         </select>
 
-        <select name="category_id">
+        <select name="category_id" onchange="this.form.submit()">
             <option value="">{{ __('transactions.filter_all_categories') }}</option>
             @foreach ($categories as $category)
                 <option value="{{ $category->id }}" @selected((string) request('category_id') === (string) $category->id)>
@@ -54,7 +55,7 @@
             @endforeach
         </select>
 
-        <select name="tourism_place_id">
+        <select name="tourism_place_id" onchange="this.form.submit()">
             <option value="">{{ __('transactions.filter_all_places') }}</option>
             @foreach ($places as $place)
                 <option value="{{ $place->id }}" @selected((string) request('tourism_place_id') === (string) $place->id)>
@@ -63,7 +64,7 @@
             @endforeach
         </select>
 
-        <select name="income_source_id">
+        <select name="income_source_id" onchange="this.form.submit()">
             <option value="">{{ __('transactions.filter_all_sources') }}</option>
             @foreach ($sources as $source)
                 <option value="{{ $source->id }}" @selected((string) request('income_source_id') === (string) $source->id)>
@@ -72,13 +73,13 @@
             @endforeach
         </select>
 
-        <button class="outline-button" type="submit">
+        <button class="text-button" type="submit">
             {{ __('transactions.btn_filter') }}
         </button>
 
-        <a class="text-button" href="{{ route('transactions.index') }}">
+        <button class="outline-button" href="{{ route('transactions.index') }}">
             {{ __('transactions.btn_reset') }}
-        </a>
+        </button>
     </form>
 
     <div style="display: flex; flex-direction: column; gap: 24px;">
