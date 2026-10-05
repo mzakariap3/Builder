@@ -85,6 +85,9 @@ return [
     'payment_failed' => 'Payment Failed',
     'no_notifications' => 'No new notifications',
     'view_all_notifications' => 'View All Notifications',
+    'all_notifications_marked_as_read' => 'All notifications marked as read.',
+    'mark_all_as_read' => 'Mark All as Read',
+    'view_details' => 'View Transaction Details',
 
     // Transaction Notifications
     'transaction_recorded' => "Transaction :type ':description' was successfully recorded.",

@@ -327,7 +327,7 @@
             <div class="pagination-links">
                 {{-- Previous --}}
                 @if ($expenses->onFirstPage())
-                    <span class="disabled">« {{ __('transactions.previous') }}</span>
+                    <span class="disabled">« {{     __('transactions.previous') }}</span>
                 @else
                     <a href="{{ $expenses->previousPageUrl() }}">« {{ __('transactions.previous') }}</a>
                 @endif

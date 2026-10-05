@@ -85,6 +85,9 @@ return [
     'payment_failed' => 'Pembayaran Gagal',
     'no_notifications' => 'Belum ada notifikasi baru',
     'view_all_notifications' => 'Lihat Semua Notifikasi',
+    'all_notifications_marked_as_read' => 'Semua notifikasi telah ditandai sebagai terbaca.',
+    'mark_all_as_read' => 'Tandai Semua Terbaca',
+    'view_details' => 'Lihat Rincian Transaksi',
 
     // Notifikasi Transaksi
     'transaction_recorded' => "Transaksi :type ':description' berhasil dicatat.",

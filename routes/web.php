@@ -6,6 +6,7 @@ use App\Http\Controllers\MasterController;
 use App\Http\Controllers\ReportController;
 use App\Http\Controllers\TransactionController;
 use App\Http\Controllers\CategoryController;
+use App\Http\Controllers\NotificationController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', fn () => redirect()->route('login'));
@@ -29,6 +30,9 @@ Route::middleware('auth')->group(function () {
     
     Route::post('/master-data/sources', [MasterController::class, 'storeSource'])->name('masters.sources.store');
     Route::put('/master-data/sources/{source}', [MasterController::class, 'updateSource'])->name('masters.sources.update');
+
+    Route::get('/notifications', [NotificationController::class, 'index'])->name('notifications.index');
+    Route::post('/notifications/read-all', [NotificationController::class, 'markAllAsRead'])->name('notifications.readAll');
     
     Route::delete('/masters/places/{place}', [MasterController::class, 'destroyPlace'])->name('masters.places.destroy');
     Route::delete('/masters/categories/{category}', [MasterController::class, 'destroyCategory'])->name('masters.categories.destroy');

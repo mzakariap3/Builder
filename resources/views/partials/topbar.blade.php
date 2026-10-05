@@ -150,7 +150,7 @@
 
                     <div class="dropdown-divider"></div>
                     <a
-                        href="{{ route('transactions.index') }}"
+                        href="{{ route('notifications.index') }}"
                         class="dropdown-item"
                         style="
                             text-align:center;
