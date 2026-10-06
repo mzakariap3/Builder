@@ -75,6 +75,9 @@
                         @php
                             $isSuccess =
                                 ($notification->data['status'] ?? '') === 'success';
+                            $isPending =
+                                ($notification->data['status'] ?? '') === 'pending';
+                            $notificationColor = $isSuccess ? '#166534' : ($isPending ? '#854d0e' : '#991b1b');
                         @endphp
 
                         <a
@@ -85,12 +88,12 @@
                                 gap:10px;
                                 align-items:flex-start;
                                 padding:10px 12px;
-                                background:{{ $isSuccess ? '#f0fdf4' : '#fef2f2' }};
+                                background:{{ $isSuccess ? '#f0fdf4' : ($isPending ? '#fffbeb' : '#fef2f2') }};
                                 border-bottom:1px solid var(--line);
                             "
                         >
                             <div style="font-size:18px;line-height:1;">
-                                {{ $isSuccess ? '✅' : '❌' }}
+                                {{ $isSuccess ? '✅' : ($isPending ? '⏳' : '❌') }}
                             </div>
 
 
@@ -101,8 +104,8 @@
                                     gap:2px;
                                 "
                             >
-                                <span style="font-weight: 700; font-size: 13px; color: {{ $isSuccess ? '#166534' : '#991b1b' }};">
-                                    {{ $isSuccess ? __('messages.payment_success') : __('messages.payment_failed') }}
+                                <span style="font-weight: 700; font-size: 13px; color: {{ $notificationColor }};">
+                                    {{ $isSuccess ? __('messages.payment_success') : ($isPending ? __('messages.payment_pending') : __('messages.payment_failed')) }}
                                 </span>
 
                                 <span

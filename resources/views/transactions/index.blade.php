@@ -14,6 +14,19 @@
         </a>
     </div>
 
+    <div class="transaction-summary">
+        <section class="transaction-total income-total">
+            <span>{{ __('messages.total_income') }}</span>
+            <strong>{{ rupiah($incomeTotal) }}</strong>
+            <small>{{ $incomes->total() }} {{ __('transactions.entries_count') }}</small>
+        </section>
+        <section class="transaction-total expense-total">
+            <span>{{ __('messages.total_expense') }}</span>
+            <strong>{{ rupiah($expenseTotal) }}</strong>
+            <small>{{ $expenses->total() }} {{ __('transactions.entries_count') }}</small>
+        </section>
+    </div>
+
     {{-- Filter --}}
     <form class="filter-panel" method="GET" action="{{ route('transactions.index') }}">
         <div class="filter-search">
@@ -23,6 +36,7 @@
                 name="search"
                 value="{{ request('search') }}"
                 placeholder="{{ __('transactions.filter_search_placeholder') }}"
+                aria-label="{{ __('transactions.filter_search_placeholder') }}"
                 onchange="this.form.submit()"
             >
         </div>
@@ -72,23 +86,19 @@
             @endforeach
         </select>
 
-        <button class="text-button" type="submit">
-            {{ __('transactions.btn_filter') }}
-        </button>
-
-        <button class="outline-button" href="{{ route('transactions.index') }}">
+        <a class="outline-button filter-reset" href="{{ route('transactions.index') }}">
             {{ __('transactions.btn_reset') }}
-        </button>
+        </a>
     </form>
 
-    <div style="display: flex; flex-direction: column; gap: 24px;">
+    <div class="transaction-tables">
 
     {{-- ================= TABEL PEMASUKAN ================= --}}
     <div class="table-card">
-        <div class="table-top" style="border-bottom: 2px solid #16a34a; padding-bottom: 12px; margin-bottom: 12px;">
-            <div style="display: flex; align-items: center; gap: 8px;">
-                <span style="font-size: 18px; font-weight: 700; color: #16a34a;">{{ __('messages.income') ?? 'Data Pemasukan' }}</span>
-                <span class="tag" style="background: #dcfce7; color: #15803d; font-weight: 600;">
+        <div class="table-top transaction-table-top income-table-top">
+            <div class="transaction-table-title">
+                <span>{{ __('messages.income') ?? 'Data Pemasukan' }}</span>
+                <span class="tag">
                     {{ $incomes->total() }} {{ __('transactions.entries_count') }}
                 </span>
             </div>
@@ -120,11 +130,11 @@
                             <td>
                                 <b>{{ $t->description }}</b>
                                 @if ($t->package_name)
-                                    <div><small style="color: #6b7280;">{{ $t->package_name }}</small></div>
+                                    <div><small>{{ $t->package_name }}</small></div>
                                 @endif
 
                                 @if (!empty($t->custom_values))
-                                    <div style="margin-top: 4px; font-size: 11px; color: #4b5563; background: #f3f4f6; padding: 4px 6px; border-radius: 4px;">
+                                    <div class="transaction-custom-values">
                                         @foreach ($t->custom_values as $key => $value)
                                             <div>
                                                 <strong>{{ ucfirst(str_replace('_', ' ', $key)) }}:</strong>
@@ -146,7 +156,7 @@
                             <td class="amount-income">+{{ rupiah($t->amount) }}</td>
                             <td>
                                 <span class="status {{ $t->status }}">
-                                    ● {{ ucfirst($t->status) }}
+                                    ● {{ $t->status === 'pending' ? __('messages.pending') : __('messages.completed') }}
                                 </span>
                             </td>
                             <td class="actions">
@@ -220,10 +230,10 @@
 
     {{-- ================= TABEL PENGELUARAN ================= --}}
     <div class="table-card">
-        <div class="table-top" style="border-bottom: 2px solid #dc2626; padding-bottom: 12px; margin-bottom: 12px;">
-            <div style="display: flex; align-items: center; gap: 8px;">
-                <span style="font-size: 18px; font-weight: 700; color: #dc2626;">{{ __('messages.expense') ?? 'Data Pengeluaran' }}</span>
-                <span class="tag" style="background: #fee2e2; color: #b91c1c; font-weight: 600;">
+        <div class="table-top transaction-table-top expense-table-top">
+            <div class="transaction-table-title">
+                <span>{{ __('messages.expense') ?? 'Data Pengeluaran' }}</span>
+                <span class="tag">
                     {{ $expenses->total() }} {{ __('transactions.entries_count') }}
                 </span>
             </div>
@@ -244,7 +254,6 @@
                         <th>{{ __('transactions.th_quantity') }}</th>
                         <th>{{ __('transactions.th_unit_price') }}</th>
                         <th>{{ __('transactions.th_total') }}</th>
-                        <th>{{ __('transactions.th_status') }}</th>
                         <th>{{ __('transactions.th_actions') }}</th>
                     </tr>
                 </thead>
@@ -255,11 +264,11 @@
                             <td>
                                 <b>{{ $t->description }}</b>
                                 @if ($t->package_name)
-                                    <div><small style="color: #6b7280;">{{ $t->package_name }}</small></div>
+                                    <div><small>{{ $t->package_name }}</small></div>
                                 @endif
 
                                 @if (!empty($t->custom_values))
-                                    <div style="margin-top: 4px; font-size: 11px; color: #4b5563; background: #f3f4f6; padding: 4px 6px; border-radius: 4px;">
+                                    <div class="transaction-custom-values">
                                         @foreach ($t->custom_values as $key => $value)
                                             <div>
                                                 <strong>{{ ucfirst(str_replace('_', ' ', $key)) }}:</strong>
@@ -279,11 +288,6 @@
                             <td>{{ rtrim(rtrim(number_format($t->quantity, 2, ',', '.'), '0'), ',') }}</td>
                             <td>{{ rupiah($t->unit_price) }}</td>
                             <td class="amount-expense">-{{ rupiah($t->amount) }}</td>
-                            <td>
-                                <span class="status {{ $t->status }}">
-                                    ● {{ ucfirst($t->status) }}
-                                </span>
-                            </td>
                             <td class="actions">
                                 <a title="{{ __('transactions.btn_edit') }}" href="{{ route('transactions.edit', $t) }}">✎</a>
                                 <form method="POST" action="{{ route('transactions.destroy', $t) }}" onsubmit="return confirm('{{ __('transactions.confirm_delete') }}')">
@@ -300,7 +304,7 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="10">
+                            <td colspan="9">
                                 <div class="empty-state">
                                     {{ __('transactions.empty_state') }}
                                 </div>

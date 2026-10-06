@@ -82,6 +82,7 @@ return [
     // Notifications
     'notifications' => 'Transaction Notifications',
     'payment_success' => 'Payment Successful',
+    'payment_pending' => 'Awaiting Approval',
     'payment_failed' => 'Payment Failed',
     'no_notifications' => 'No new notifications',
     'view_all_notifications' => 'View All Notifications',

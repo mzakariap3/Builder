@@ -487,9 +487,38 @@ h2{
 }
 
 .bar{
+    position:relative;
     width:28px;
     border-radius:4px 4px 0 0;
     min-height:7px
+}
+
+.bar::after{
+    content:attr(data-tooltip);
+    position:absolute;
+    z-index:5;
+    left:50%;
+    bottom:calc(100% + 9px);
+    transform:translate(-50%, 3px);
+    padding:7px 10px;
+    border-radius:7px;
+    background:#2c2520;
+    color:#fff;
+    font-size:12px;
+    font-weight:600;
+    line-height:1.35;
+    white-space:nowrap;
+    opacity:0;
+    visibility:hidden;
+    pointer-events:none;
+    transition:opacity .15s ease, transform .15s ease, visibility .15s ease
+}
+
+.bar:hover::after,
+.bar:focus-visible::after{
+    opacity:1;
+    visibility:visible;
+    transform:translate(-50%, 0)
 }
 
 .gold-bar{
@@ -563,12 +592,14 @@ h2{
 .filter-panel{
     background:rgba(255,255,255,.92);
     border-radius:15px;
-    padding:20px;
+    padding:16px;
     display:flex;
     gap:10px;
     flex-wrap:wrap;
     align-items:center;
-    margin-bottom:18px
+    margin-bottom:22px;
+    border:1px solid rgba(223,210,191,.8);
+    box-shadow:0 8px 24px rgba(71,35,20,.04)
 }
 
 .filter-panel select,
@@ -601,6 +632,111 @@ h2{
     outline:0;
     width:100%;
     padding:8px
+}
+
+.filter-reset{
+    min-height:43px;
+    padding-top:9px;
+    padding-bottom:9px
+}
+
+.transaction-summary{
+    display:grid;
+    grid-template-columns:repeat(2,minmax(0,1fr));
+    gap:16px;
+    margin-bottom:20px
+}
+
+.transaction-total{
+    display:grid;
+    gap:7px;
+    padding:18px 22px;
+    border:1px solid var(--line);
+    border-left:4px solid transparent;
+    border-radius:14px;
+    background:rgba(255,255,255,.96);
+    box-shadow:0 8px 22px rgba(71,35,20,.045)
+}
+
+.transaction-total>span{
+    color:var(--muted);
+    font-size:13px;
+    font-weight:700
+}
+
+.transaction-total strong{
+    font-size:clamp(22px,2.2vw,30px);
+    line-height:1.2;
+    overflow-wrap:anywhere
+}
+
+.transaction-total small{
+    color:#81796e;
+    font-size:12px
+}
+
+.income-total{
+    border-left-color:#3c9460
+}
+
+.expense-total{
+    border-left-color:#bd6460
+}
+
+.transaction-tables{
+    display:flex;
+    flex-direction:column;
+    gap:22px
+}
+
+.transaction-table-top{
+    min-height:66px;
+    margin:0;
+    padding:14px 18px;
+    border-bottom:1px solid var(--line)
+}
+
+.income-table-top{
+    box-shadow:inset 4px 0 #3c9460
+}
+
+.expense-table-top{
+    box-shadow:inset 4px 0 #bd6460
+}
+
+.transaction-table-title{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    font-size:16px;
+    font-weight:800
+}
+
+.income-table-top .transaction-table-title>span:first-child{
+    color:#26764a
+}
+
+.expense-table-top .transaction-table-title>span:first-child{
+    color:#a74642
+}
+
+.income-table-top .tag{
+    background:#e8f5ed;
+    color:#26764a
+}
+
+.expense-table-top .tag{
+    background:#fbeceb;
+    color:#a74642
+}
+
+.transaction-custom-values{
+    margin-top:5px;
+    padding:5px 7px;
+    border-radius:5px;
+    background:#f6f3ee;
+    color:#62594f;
+    font-size:11px
 }
 
 .table-card{
@@ -958,25 +1094,48 @@ td small{
 }
 
 .donut{
+    position:relative;
     width:205px;
     height:205px;
     border-radius:50%;
-    background:conic-gradient(
-        #a24945 0 35%,
-        #7e6210 35% 60%,
-        #d3c7b3 60% 85%,
-        #5e2b2d 85% 100%
-    );
+    background:transparent;
     display:grid;
-    place-items:center
+    place-items:center;
+    transition:transform .2s ease, box-shadow .2s ease;
+    box-shadow:0 12px 28px rgba(67,38,28,.08)
 }
 
-.donut::after{
-    content:'';
-    position:absolute
+.donut:hover,
+.donut:focus-within{
+    transform:translateY(-2px) scale(1.02);
+    box-shadow:0 18px 30px rgba(67,38,28,.12)
+}
+
+.donut-chart{
+    position:absolute;
+    inset:0;
+    width:100%;
+    height:100%;
+    transform:rotate(-90deg);
+    overflow:visible
+}
+
+.donut-segment{
+    pointer-events:stroke;
+    cursor:pointer;
+    transition:filter .15s ease, stroke-width .15s ease
+}
+
+.donut-segment:hover,
+.donut-segment:focus-visible{
+    filter:brightness(.82);
+    stroke-width:50;
+    outline:none
 }
 
 .donut>div{
+    position:relative;
+    z-index:1;
     width:120px;
     height:120px;
     border-radius:50%;
@@ -1006,7 +1165,14 @@ td small{
     display:flex;
     justify-content:space-between;
     border-bottom:1px solid #eee5db;
-    padding-bottom:9px
+    padding-bottom:9px;
+    cursor:pointer;
+    transition:color .15s ease, transform .15s ease
+}
+
+.distribution-list>div:hover{
+    color:#5e2b2d;
+    transform:translateX(2px)
 }
 
 .distribution-list span{
@@ -2085,6 +2251,35 @@ td small{
 }
 
 @media(max-width:760px){
+
+    .transaction-summary{
+        grid-template-columns:1fr
+    }
+
+    .transaction-total{
+        padding:16px
+    }
+
+    .transaction-table-top{
+        align-items:flex-start;
+        flex-wrap:wrap;
+        gap:10px
+    }
+
+    .transaction-table-title{
+        flex-wrap:wrap
+    }
+
+    .filter-panel{
+        padding:13px
+    }
+
+    .filter-panel select,
+    .filter-search,
+    .filter-reset{
+        width:100%;
+        min-width:0
+    }
 
     .app-background{
         inset:0;

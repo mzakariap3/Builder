@@ -125,30 +125,53 @@
             <span>{{ __('messages.by_category') }}</span>
         </div>
         <div class="donut-wrap">
+            @php
+                $offset = 0;
+                $circumference = 477.52;
+                $categoryColors = [
+                    'maintenance' => '#a24945',
+                    'marketing' => '#c6a44a',
+                    'operations' => '#d3c7b3',
+                ];
+                $fallbackColors = ['#5e2b2d', '#7e6210', '#8a7464', '#9b8060'];
+            @endphp
 
-            @php($offset = 0)
-            @php($segments = [])
-
-            @foreach($distribution as $item)
-
-                @php($next = $offset + $item->percentage)
-
-                @php($segments[] =
-                    ($loop->index % 4 === 0
-                        ? '#a24945'
-                        : ($loop->index % 4 === 1
-                            ? '#7e6210'
-                            : ($loop->index % 4 === 2
-                                ? '#d3c7b3'
-                                : '#5e2b2d')))
-                    . ' ' . $offset . '% ' . $next . '%'
-                )
-                @php($offset = $next)
-            @endforeach
-            <div
-                class="donut"
-                style="background:conic-gradient({{ implode(',', $segments) ?: '#eee5d8 0 100%' }})"
-            >
+            <div class="donut" role="group" aria-label="{{ __('messages.expense_distribution') }}">
+                <svg class="donut-chart" viewBox="0 0 200 200">
+                    @php
+                        $offset = 0;
+                    @endphp
+                    @foreach($distribution as $item)
+                        @php
+                            $categorySlug = \Illuminate\Support\Str::slug($item->category_name, '_');
+                            $categoryTranslation = __('categories.' . $categorySlug);
+                            $categoryLabel = $categoryTranslation !== 'categories.' . $categorySlug
+                                ? $categoryTranslation
+                                : $item->category_name;
+                            $color = $categoryColors[$categorySlug] ?? $fallbackColors[$loop->index % count($fallbackColors)];
+                            $segmentLength = $circumference * $item->percentage / 100;
+                        @endphp
+                        <circle
+                            class="donut-segment"
+                            cx="100"
+                            cy="100"
+                            r="76"
+                            fill="none"
+                            stroke="{{ $color }}"
+                            stroke-width="45"
+                            stroke-dasharray="{{ $segmentLength }} {{ $circumference }}"
+                            stroke-dashoffset="{{ -$circumference * $offset / 100 }}"
+                            tabindex="0"
+                            role="img"
+                            aria-label="{{ $categoryLabel }}: {{ number_format($item->percentage, 1, ',', '.') }}%, {{ rupiah($item->total) }}"
+                        >
+                            <title>{{ $categoryLabel }}: {{ number_format($item->percentage, 1, ',', '.') }}% — {{ rupiah($item->total) }}</title>
+                        </circle>
+                        @php
+                            $offset += $item->percentage;
+                        @endphp
+                    @endforeach
+                </svg>
                 <div>
                     <small>{{ __('messages.total') }}</small>
                     <b>
@@ -172,12 +195,21 @@
             </div>
             <div class="distribution-list">
                 @foreach($distribution as $item)
-                    <div>
+                    @php
+                        $categorySlug = \Illuminate\Support\Str::slug($item->category_name, '_');
+                        $categoryTranslation = __('categories.' . $categorySlug);
+                        $categoryLabel = $categoryTranslation !== 'categories.' . $categorySlug
+                            ? $categoryTranslation
+                            : $item->category_name;
+                        $color = $categoryColors[$categorySlug] ?? $fallbackColors[$loop->index % count($fallbackColors)];
+                    @endphp
+                    <div
+                        title="{{ $categoryLabel }}: {{ number_format($item->percentage, 1, ',', '.') }}%"
+                        aria-label="{{ $categoryLabel }}: {{ number_format($item->percentage, 1, ',', '.') }}%"
+                    >
                         <span>
-                            <i class="dot {{ $loop->index % 2 ? 'red' : 'gold' }}"></i>
-                            {{ __('categories.' . \Illuminate\Support\Str::slug($item->category_name, '_')) !== 'categories.' . \Illuminate\Support\Str::slug($item->category_name, '_')
-                                ? __('categories.' . \Illuminate\Support\Str::slug($item->category_name, '_'))
-                                : $item->category_name }}
+                            <i class="dot" style="background-color: {{ $color }}"></i>
+                            {{ $categoryLabel }}
                         </span>
                         <b>{{ number_format($item->percentage, 1, ',', '.') }}%</b>
                     </div>

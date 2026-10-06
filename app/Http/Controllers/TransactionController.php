@@ -46,6 +46,9 @@ class TransactionController extends Controller
             $query->whereYear('transaction_date', $request->year);
         }
 
+        $incomeTotal = (clone $query)->where('type', 'income')->sum('amount');
+        $expenseTotal = (clone $query)->where('type', 'expense')->sum('amount');
+
         // Pemasukan (Income)
         $incomes = (clone $query)->where('type', 'income')
             ->latest('transaction_date')
@@ -62,7 +65,15 @@ class TransactionController extends Controller
         $places = TourismPlace::where('is_active', true)->orderBy('name')->get();
         $sources = IncomeSource::where('is_active', true)->orderBy('name')->get();
 
-        return view('transactions.index', compact('incomes', 'expenses', 'categories', 'places', 'sources'));
+        return view('transactions.index', compact(
+            'incomes',
+            'expenses',
+            'incomeTotal',
+            'expenseTotal',
+            'categories',
+            'places',
+            'sources'
+        ));
     }
 
     public function create(): View
@@ -80,12 +91,12 @@ class TransactionController extends Controller
         $validated = $this->validateEntry($request);
         $validated['user_id'] = $request->user()?->id;
         $validated['amount'] = round((float) ($validated['quantity'] ?? 0) * (float) ($validated['unit_price'] ?? 0), 2);
-        $validated['status'] = $validated['status'] ?? 'completed';
+        $validated['status'] = $validated['status'] ?? 'pending';
         $validated['proof_path'] = $this->storeProof($request);
 
         $transaction = Transaction::create($validated);
 
-        $statusNotif = $transaction->status === 'completed' ? 'success' : 'failed';
+        $statusNotif = $transaction->status === 'completed' ? 'success' : 'pending';
 
         $pesanNotif = $statusNotif === 'success'
             ? __('messages.transaction_recorded', [
@@ -123,7 +134,7 @@ class TransactionController extends Controller
 
         $transaction->update($validated);
 
-        $statusNotif = $transaction->status === 'completed' ? 'success' : 'failed';
+        $statusNotif = $transaction->status === 'completed' ? 'success' : 'pending';
         $pesanNotif = __('messages.transaction_updated', [
             'description' => $transaction->description,
         ]);

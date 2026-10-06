@@ -33,7 +33,11 @@
         @forelse ($notifications as $notification)
             @php
                 $isSuccess = ($notification->data['status'] ?? '') === 'success';
+                $isPending = ($notification->data['status'] ?? '') === 'pending';
                 $isRead = !is_null($notification->read_at);
+                $notificationColor = $isSuccess ? '#166534' : ($isPending ? '#854d0e' : '#991b1b');
+                $notificationBackground = $isSuccess ? '#f0fdf4' : ($isPending ? '#fffbeb' : '#fef2f2');
+                $notificationBorder = $isSuccess ? '#bbf7d0' : ($isPending ? '#fde68a' : '#fecaca');
             @endphp
 
             <div class="notification-card" style="
@@ -42,21 +46,21 @@
                 gap: 14px;
                 padding: 16px;
                 border-radius: 8px;
-                background: {{ $isRead ? '#ffffff' : ($isSuccess ? '#f0fdf4' : '#fef2f2') }};
-                border: 1px solid {{ $isRead ? '#e5e7eb' : ($isSuccess ? '#bbf7d0' : '#fecaca') }};
+                background: {{ $isRead ? '#ffffff' : $notificationBackground }};
+                border: 1px solid {{ $isRead ? '#e5e7eb' : $notificationBorder }};
                 box-shadow: 0 1px 2px rgba(0,0,0,0.03);
                 position: relative;
             ">
                 {{-- Status Icon --}}
                 <div style="font-size: 22px; line-height: 1; flex-shrink: 0;">
-                    {{ $isSuccess ? '✅' : '❌' }}
+                    {{ $isSuccess ? '✅' : ($isPending ? '⏳' : '❌') }}
                 </div>
 
                 {{-- Body Content --}}
                 <div style="flex-grow: 1;">
                     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
-                        <span style="font-weight: 700; font-size: 14px; color: {{ $isSuccess ? '#166534' : '#991b1b' }};">
-                            {{ $isSuccess ? (__('messages.payment_success') ?? 'Pembayaran Berhasil') : (__('messages.payment_failed') ?? 'Pembayaran Gagal') }}
+                        <span style="font-weight: 700; font-size: 14px; color: {{ $notificationColor }};">
+                            {{ $isSuccess ? __('messages.payment_success') : ($isPending ? __('messages.payment_pending') : __('messages.payment_failed')) }}
                         </span>
                         
                         <span style="font-size: 11px; color: #9ca3af;">

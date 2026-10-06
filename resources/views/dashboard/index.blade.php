@@ -139,13 +139,19 @@
                             <div
                                 class="bar gold-bar"
                                 style="height: {{ max(7, ($item['income'] / $maxChart) * 180) }}px"
-                                title="Income: {{ rupiah($item['income']) }}"
+                                title="{{ __('messages.income') }} - {{ $item['label'] }}: {{ rupiah($item['income']) }}"
+                                data-tooltip="{{ __('messages.income') }} · {{ $item['label'] }}: {{ rupiah($item['income']) }}"
+                                aria-label="{{ __('messages.income') }} {{ $item['label'] }}: {{ rupiah($item['income']) }}"
+                                tabindex="0"
                             ></div>
 
                             <div
                                 class="bar red-bar"
                                 style="height: {{ max(7, ($item['expense'] / $maxChart) * 180) }}px"
-                                title="Expense: {{ rupiah($item['expense']) }}"
+                                title="{{ __('messages.expense') }} - {{ $item['label'] }}: {{ rupiah($item['expense']) }}"
+                                data-tooltip="{{ __('messages.expense') }} · {{ $item['label'] }}: {{ rupiah($item['expense']) }}"
+                                aria-label="{{ __('messages.expense') }} {{ $item['label'] }}: {{ rupiah($item['expense']) }}"
+                                tabindex="0"
                             ></div>
 
                         </div>

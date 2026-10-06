@@ -82,6 +82,7 @@ return [
     // Notifikasi
     'notifications' => 'Notifikasi Transaksi',
     'payment_success' => 'Pembayaran Berhasil',
+    'payment_pending' => 'Menunggu Persetujuan',
     'payment_failed' => 'Pembayaran Gagal',
     'no_notifications' => 'Belum ada notifikasi baru',
     'view_all_notifications' => 'Lihat Semua Notifikasi',

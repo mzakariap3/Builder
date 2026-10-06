@@ -42,7 +42,7 @@
                 @foreach($categories as $category)
                     <option value="{{ $category->id }}"
                         data-type="{{ $category->type }}"
-                        data-fields="{{ json_encode($category->required_fields ?? ['date', 'quantity', 'unit_price', 'amount', 'payment_method', 'description', 'place', 'source', 'package', 'proof', 'status']) }}"
+                        data-fields="{{ json_encode($category->required_fields ?? ['date', 'quantity', 'unit_price', 'amount', 'payment_method', 'description', 'place', 'source', 'package', 'proof']) }}"
                         @selected((string)old('category_id',$transaction->category_id??'') === (string)$category->id)>
                         {{ $category->name }}
                     </option>
@@ -188,14 +188,14 @@
                 <label>{{ __('messages.status') }}</label>
 
                 <select name="status">
-                    <option value="completed"
-                        @selected(old('status',$transaction->status??'completed') === 'completed')>
-                        {{ __('messages.completed') }}
+                    <option value="pending"
+                        @selected(old('status',$transaction->status??'pending') === 'pending')>
+                        {{ __('messages.pending') }}
                     </option>
 
-                    <option value="pending"
-                        @selected(old('status',$transaction->status??'completed') === 'pending')>
-                        {{ __('messages.pending') }}
+                    <option value="completed"
+                        @selected(old('status',$transaction->status??'pending') === 'completed')>
+                        {{ __('messages.completed') }}
                     </option>
                 </select>
             </div>
@@ -347,6 +347,12 @@ document.addEventListener('DOMContentLoaded', function() {
 
             if (fieldName === 'source' && currentType !== 'income') {
                 isAllowed = false;
+            }
+
+            if (fieldName === 'status' && currentType !== 'income') {
+                isAllowed = false;
+            } else if (fieldName === 'status') {
+                isAllowed = true;
             }
 
             if (isAllowed) {
