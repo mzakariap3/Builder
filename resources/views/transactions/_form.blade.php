@@ -1,5 +1,15 @@
 @php($editing = isset($transaction))
 <form method="POST" action="{{ $editing ? route('transactions.update',$transaction) : route('transactions.store') }}" enctype="multipart/form-data" class="entry-form" id="entryForm">
+    @if ($errors->any())
+    <div class="alert alert-danger" style="margin-bottom: 20px; padding: 15px; background: #fee2e2; color: #991b1b; border-radius: 8px;">
+        <strong>Transaksi gagal disimpan:</strong>
+        <ul style="margin: 8px 0 0 20px;">
+            @foreach ($errors->all() as $error)
+                <li>{{ $error }}</li>
+            @endforeach
+        </ul>
+    </div>
+@endif
     @csrf
     @if($editing) @method('PUT') @endif
     
@@ -258,13 +268,17 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     function renderCategoryCustomFields(categoryId) {
-        if (!categoryId || !customFieldsContainer) return;
+        if (!categoryId || !customFieldsContainer || !customFieldsList) return;
 
         fetch(`/api/categories/${categoryId}/fields`)
-            .then(res => res.json())
+            .then(response => {
+                if (!response.ok) throw new Error('Gagal memuat custom fields.');
+                return response.json();
+            })
             .then(fields => {
                 customFieldsList.innerHTML = '';
-                if (!fields || fields.length === 0) {
+
+                if (!Array.isArray(fields) || fields.length === 0) {
                     customFieldsContainer.style.display = 'none';
                     return;
                 }
@@ -272,52 +286,91 @@ document.addEventListener('DOMContentLoaded', function() {
                 customFieldsContainer.style.display = 'block';
 
                 fields.forEach(field => {
+                    const fieldType = String(field.field_type || 'text').toLowerCase();
+                    const keyName = String(field.field_name || field.id);
+                    const value = existingCustomValues[keyName] ?? '';
+                    const isRequired = Boolean(field.is_required);
+
                     const fieldDiv = document.createElement('div');
-                    fieldDiv.className = (field.field_type === 'textarea' || field.field_type === 'file') ? 'field full' : 'field';
+                    fieldDiv.className = (fieldType === 'textarea' || fieldType === 'file')
+                        ? 'field full'
+                        : 'field';
 
                     const label = document.createElement('label');
-                    label.innerHTML = `${field.field_label} ${field.is_required ? '<span style="color:red">*</span>' : ''}`;
+                    label.textContent = field.field_label || keyName;
+                    if (isRequired) {
+                        const mark = document.createElement('span');
+                        mark.textContent = ' *';
+                        mark.style.color = 'red';
+                        label.appendChild(mark);
+                    }
                     fieldDiv.appendChild(label);
 
-                    const keyName = field.field_name || field.id;
-                    const inputName = `custom_fields[${keyName}]`;
-                    const val = existingCustomValues[keyName] || '';
-                    const requiredAttr = field.is_required ? 'required' : '';
+                    let input;
 
-                    let inputEl = '';
-                    if (field.field_type === 'text') {
-                        inputEl = `<input type="text" name="${inputName}" value="${val}" ${requiredAttr}>`;
-                    } else if (field.field_type === 'number') {
-                        inputEl = `<input type="number" name="${inputName}" value="${val}" ${requiredAttr}>`;
-                    } else if (field.field_type === 'date') {
-                        inputEl = `<input type="date" name="${inputName}" value="${val}" ${requiredAttr}>`;
-                    } else if (field.field_type === 'textarea') {
-                        inputEl = `<textarea name="${inputName}" rows="3" ${requiredAttr}>${val}</textarea>`;
-                    } else if (field.field_type === 'select') {
-                        let parsedOptions = [];
-                        if (Array.isArray(field.options)) {
-                            parsedOptions = field.options;
-                        } else if (typeof field.options === 'string' && field.options.trim() !== '') {
-                            parsedOptions = field.options.split(',').map(item => item.trim());
-                        }
+                    if (fieldType === 'textarea') {
+                        input = document.createElement('textarea');
+                        input.rows = 3;
+                        input.value = value == null ? '' : String(value);
+                    } else if (fieldType === 'select') {
+                        input = document.createElement('select');
 
-                        let opts = '<option value="">-- Pilih --</option>';
-                        parsedOptions.forEach(opt => {
-                            if (opt !== '') {
-                                const selected = val === opt ? 'selected' : '';
-                                opts += `<option value="${opt}" ${selected}>${opt}</option>`;
+                        const placeholder = document.createElement('option');
+                        placeholder.value = '';
+                        placeholder.textContent = '-- Pilih --';
+                        input.appendChild(placeholder);
+
+                        let options = field.options || [];
+                        if (typeof options === 'string') {
+                            try {
+                                options = JSON.parse(options);
+                            } catch (error) {
+                                options = options.split(',');
                             }
+                        }
+                        if (!Array.isArray(options)) options = [];
+
+                        options.forEach(optionValue => {
+                            const option = document.createElement('option');
+                            option.value = String(optionValue).trim();
+                            option.textContent = String(optionValue).trim();
+                            option.selected = String(value) === option.value;
+                            input.appendChild(option);
                         });
-                        inputEl = `<select name="${inputName}" ${requiredAttr}>${opts}</select>`;
-                    } else if (field.field_type === 'file') {
-                        inputEl = `<input type="file" name="${inputName}" accept="image/*,.pdf" ${requiredAttr}>`;
+                    } else if (fieldType === 'file') {
+                        input = document.createElement('input');
+                        input.type = 'file';
+                        input.accept = 'image/*,.pdf';
+
+                        if (value && typeof value === 'string') {
+                            const currentFile = document.createElement('small');
+                            currentFile.className = 'existing-custom-file';
+                            currentFile.textContent = `File tersimpan: ${value}`;
+                            currentFile.style.display = 'block';
+                            currentFile.style.marginTop = '6px';
+                            fieldDiv.appendChild(input);
+                            fieldDiv.appendChild(currentFile);
+                            input.name = `custom_values[${keyName}]`;
+                            customFieldsList.appendChild(fieldDiv);
+                            return;
+                        }
+                    } else {
+                        input = document.createElement('input');
+                        input.type = ['text', 'number', 'date'].includes(fieldType)
+                            ? fieldType
+                            : 'text';
+                        input.value = value == null ? '' : String(value);
                     }
 
-                    fieldDiv.insertAdjacentHTML('beforeend', inputEl);
+                    input.name = `custom_values[${keyName}]`;
+                    if (isRequired && fieldType !== 'file') input.required = true;
+
+                    fieldDiv.appendChild(input);
                     customFieldsList.appendChild(fieldDiv);
                 });
             })
-            .catch(() => {
+            .catch(error => {
+                console.error(error);
                 customFieldsContainer.style.display = 'none';
             });
     }
@@ -334,7 +387,23 @@ document.addEventListener('DOMContentLoaded', function() {
         dynamicFields.style.display = 'block';
 
         const currentType = typeInput.value;
-        const allowedFields = JSON.parse(selectedOption.getAttribute('data-fields') || '[]');
+        let allowedFields = [];
+        try {
+            const parsedFields = JSON.parse(selectedOption.getAttribute('data-fields') || '[]');
+            allowedFields = Array.isArray(parsedFields) ? parsedFields : [];
+        } catch (error) {
+            allowedFields = [];
+        }
+
+        // Support both legacy aliases and database column names.
+        const fieldAliases = {
+            transaction_date: 'date',
+            tourism_place_id: 'place',
+            income_source_id: 'source',
+            package_name: 'package',
+            proof_path: 'proof'
+        };
+        allowedFields = allowedFields.map(name => fieldAliases[name] || name);
 
         document.querySelectorAll('[data-field]').forEach(fieldEl => {
             const fieldName = fieldEl.getAttribute('data-field');

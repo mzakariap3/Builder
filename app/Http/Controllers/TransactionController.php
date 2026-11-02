@@ -29,11 +29,11 @@ class TransactionController extends Controller
         if ($request->filled('category_id')) {
             $query->where('category_id', $request->category_id);
         }
-        
+
         if ($request->filled('tourism_place_id')) {
             $query->where('tourism_place_id', $request->tourism_place_id);
         }
-        
+
         if ($request->filled('income_source_id')) {
             $query->where('income_source_id', $request->income_source_id);
         }
@@ -49,13 +49,11 @@ class TransactionController extends Controller
         $incomeTotal = (clone $query)->where('type', 'income')->sum('amount');
         $expenseTotal = (clone $query)->where('type', 'expense')->sum('amount');
 
-        // Pemasukan (Income)
         $incomes = (clone $query)->where('type', 'income')
             ->latest('transaction_date')
             ->paginate(8, ['*'], 'income_page')
             ->withQueryString();
 
-        // Pengeluaran (Expense)
         $expenses = (clone $query)->where('type', 'expense')
             ->latest('transaction_date')
             ->paginate(8, ['*'], 'expense_page')
@@ -93,6 +91,7 @@ class TransactionController extends Controller
         $validated['amount'] = round((float) ($validated['quantity'] ?? 0) * (float) ($validated['unit_price'] ?? 0), 2);
         $validated['status'] = $validated['status'] ?? 'pending';
         $validated['proof_path'] = $this->storeProof($request);
+        $validated['custom_values'] = $this->processCustomValues($request);
 
         $transaction = Transaction::create($validated);
 
@@ -126,12 +125,15 @@ class TransactionController extends Controller
         $validated = $this->validateEntry($request);
         $validated['amount'] = round((float) ($validated['quantity'] ?? 0) * (float) ($validated['unit_price'] ?? 0), 2);
         $validated['status'] = $validated['status'] ?? $transaction->status;
-        
+
         if ($path = $this->storeProof($request)) {
-            if ($transaction->proof_path) Storage::disk('public')->delete($transaction->proof_path);
+            if ($transaction->proof_path) {
+                Storage::disk('public')->delete($transaction->proof_path);
+            }
             $validated['proof_path'] = $path;
         }
 
+        $validated['custom_values'] = $this->processCustomValues($request, $transaction);
         $transaction->update($validated);
 
         $statusNotif = $transaction->status === 'completed' ? 'success' : 'pending';
@@ -150,8 +152,12 @@ class TransactionController extends Controller
 
     public function destroy(Transaction $transaction): RedirectResponse
     {
-        if ($transaction->proof_path) Storage::disk('public')->delete($transaction->proof_path);
+        if ($transaction->proof_path) {
+            Storage::disk('public')->delete($transaction->proof_path);
+        }
+
         $transaction->delete();
+
         return back()->with('success', 'Transaksi berhasil dihapus.');
     }
 
@@ -170,7 +176,7 @@ class TransactionController extends Controller
             'description' => ['required', 'string', 'max:500'],
             'status' => ['nullable', 'in:completed,pending'],
             'proof' => ['nullable', 'file', 'mimes:jpg,jpeg,png,pdf', 'max:5120'],
-            'custom_values' => ['nullable', 'array'], // Menampung input kustom dari kategori
+            'custom_values' => ['nullable', 'array'],
         ], [
             'category_id.required' => 'Kategori wajib dipilih sebelum tanggal dan jumlah.',
             'proof.max' => 'Bukti bayar maksimal 5 MB.',
@@ -180,13 +186,61 @@ class TransactionController extends Controller
             $validated['income_source_id'] = null;
         }
 
-        unset($validated['proof']);
+        // Custom field uploads are handled separately and must not be passed as JSON values.
+        unset($validated['proof'], $validated['custom_values']);
+
         return $validated;
+    }
+
+    /**
+     * Merge custom field text values and uploads into the JSON custom_values column.
+     * On update, existing custom file paths are preserved when no replacement is uploaded.
+     */
+    private function processCustomValues(Request $request, ?Transaction $transaction = null): array
+    {
+        $values = $transaction?->custom_values ?? [];
+
+        if (!is_array($values)) {
+            $values = [];
+        }
+
+        $submittedValues = $request->input('custom_values', []);
+        if (is_array($submittedValues)) {
+            foreach ($submittedValues as $key => $value) {
+                if (is_string($key) || is_int($key)) {
+                    $values[$key] = is_scalar($value) || $value === null ? $value : '';
+                }
+            }
+        }
+
+        // Nested uploads such as custom_values[field_name] are read from allFiles().
+        $allFiles = $request->allFiles();
+        $customFiles = $allFiles['custom_values'] ?? [];
+
+        if (is_array($customFiles)) {
+            foreach ($customFiles as $key => $file) {
+                if ($file instanceof \Illuminate\Http\UploadedFile && $file->isValid()) {
+                    $oldPath = $values[$key] ?? null;
+                    $newPath = $file->store('custom_field_uploads', 'public');
+
+                    if ($newPath) {
+                        if (is_string($oldPath) && $oldPath !== '') {
+                            Storage::disk('public')->delete($oldPath);
+                        }
+                        $values[$key] = $newPath;
+                    }
+                }
+            }
+        }
+
+        return $values;
     }
 
     private function storeProof(Request $request): ?string
     {
-        return $request->hasFile('proof') ? $request->file('proof')->store('payment_proofs', 'public') : null;
+        return $request->hasFile('proof')
+            ? $request->file('proof')->store('payment_proofs', 'public')
+            : null;
     }
 
     private function formData(): array
